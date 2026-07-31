@@ -10,7 +10,7 @@ import { notFound } from "next/navigation";
 import { EmptyState } from "@/components/shared/empty-state";
 import { Rating } from "@/components/shared/rating";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { avatarUrl, formatCurrency, formatDate } from "@/lib/format";
 import { getMe } from "@/service/getMe";

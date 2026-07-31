@@ -1,7 +1,7 @@
 "use client";
 
 import { CreditCardIcon } from "lucide-react";
-import { useActionState, useEffect } from "react";
+import { useActionState } from "react";
 import { toast } from "sonner";
 import { FormAlert, SubmitButton } from "@/components/shared/form";
 import { IFormState } from "@/lib/types";
@@ -15,14 +15,11 @@ import { startCheckout } from "../_actions/paymentActions";
  * click, something went wrong and the message says what.
  */
 export function StripeCheckoutButton({ bookingId }: { bookingId: string }) {
-  const [state, formAction] = useActionState<IFormState, FormData>(
-    async (prevState) => startCheckout(bookingId, prevState),
-    null,
-  );
-
-  useEffect(() => {
-    if (state && !state.success) toast.error(state.message);
-  }, [state]);
+  const [state, formAction] = useActionState<IFormState, FormData>(async () => {
+    const result = await startCheckout(bookingId);
+    if (result && !result.success) toast.error(result.message);
+    return result;
+  }, null);
 
   return (
     <form action={formAction} className="space-y-3">

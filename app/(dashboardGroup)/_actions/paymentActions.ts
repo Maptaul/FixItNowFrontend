@@ -20,7 +20,6 @@ export const getMyPayments = async (): Promise<IPayment[]> => {
  */
 export const startCheckout = async (
   bookingId: string,
-  _prevState: IFormState,
 ): Promise<IFormState> => {
   const result = await apiFetch<ICheckoutSession>("/api/payments/create", {
     method: "POST",

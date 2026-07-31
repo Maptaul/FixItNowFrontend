@@ -2,7 +2,7 @@
 
 import { StarIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { ReactNode, useActionState, useEffect, useState } from "react";
+import { ReactNode, useActionState, useState } from "react";
 import { toast } from "sonner";
 import { Field, FormAlert, SubmitButton } from "@/components/shared/form";
 import {
@@ -32,22 +32,24 @@ export function ReviewDialog({
   const [rating, setRating] = useState(5);
   const [hovered, setHovered] = useState(0);
 
+  // Side effects live in the action, not an effect: closing the dialog is a
+  // consequence of the submit, not of the state changing.
   const [state, formAction] = useActionState<IFormState, FormData>(
-    createReview.bind(null, booking.id),
+    async (prevState, formData) => {
+      const result = await createReview(booking.id, prevState, formData);
+
+      if (result?.success) {
+        toast.success(result.message);
+        setOpen(false);
+        router.refresh();
+      } else if (result) {
+        toast.error(result.message);
+      }
+
+      return result;
+    },
     null,
   );
-
-  useEffect(() => {
-    if (!state) return;
-
-    if (state.success) {
-      toast.success(state.message);
-      setOpen(false);
-      router.refresh();
-    } else {
-      toast.error(state.message);
-    }
-  }, [state, router]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

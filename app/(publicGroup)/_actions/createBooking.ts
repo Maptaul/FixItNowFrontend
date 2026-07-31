@@ -69,7 +69,6 @@ export const createBooking = async (
 
   // The slot the customer just took is no longer free for anyone else.
   updateTag(`technician-${technicianId}`);
-  updateTag("my-bookings");
 
   return {
     success: true,
