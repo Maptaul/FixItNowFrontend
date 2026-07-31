@@ -47,7 +47,8 @@ export default async function DashboardLayout({
           </div>
         </header>
 
-        <main className="flex-1 p-4 sm:p-6">{children}</main>
+        {/* A div, not <main> — SidebarInset already renders the <main>. */}
+        <div className="flex-1 p-4 sm:p-6">{children}</div>
       </SidebarInset>
     </SidebarProvider>
   );
