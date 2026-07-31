@@ -42,3 +42,6 @@ next-env.d.ts
 
 # Local env
 .env*.local
+
+# ...but the template belongs in the repo.
+!.env.example
