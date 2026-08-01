@@ -23,7 +23,7 @@ import { ROLE_LABEL, SIDEBAR_ITEMS } from "../_config/sidebarMenuItems";
 /**
  * Dashboard sidebar — design handoff § Dashboard shell.
  *
- * 248px expanded / 68px icon rail, sticky full height, 1px right border on
+ * 216px expanded / 68px icon rail, sticky full height, 1px right border on
  * --surface. The brand block carries a 32px r10 primary tile plus the role
  * label; nav items are 9px/11px at r10 with an 18px centred icon slot. When
  * collapsed only the icon renders, and each item keeps its label as a

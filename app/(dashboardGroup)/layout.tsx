@@ -26,7 +26,11 @@ const DashboardLayout = async ({ children }: { children: React.ReactNode }) => {
       <SidebarProvider
         style={
           {
-            "--sidebar-width": "248px",
+            // The handoff draws 248px, but nothing here needs it: the
+            // wordmark is 145px wide and the longest label ("Job requests")
+            // is 12 characters. 216px still clears both and gives the
+            // content area 32px back.
+            "--sidebar-width": "216px",
             "--sidebar-width-icon": "68px",
           } as React.CSSProperties
         }
