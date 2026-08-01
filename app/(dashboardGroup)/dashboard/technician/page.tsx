@@ -1,6 +1,6 @@
 import {
-  BellRingIcon,
-  CalendarCheckIcon,
+  BriefcaseIcon,
+  CheckCheckIcon,
   StarIcon,
   WalletIcon,
 } from "lucide-react";
@@ -15,11 +15,22 @@ import { earningsByDay, technicianPerformance } from "@/lib/analytics";
 import { formatCurrency, formatRating, toNumber } from "@/lib/format";
 import { getMe } from "@/service/getMe";
 import { getTechnicianBookings } from "../../_actions/bookingActions";
-import { BookingsTable } from "../../_components/BookingsTable";
+import { IncomingRequests } from "../../_components/IncomingRequests";
 import { PageHeader } from "../../_components/PageHeader";
 import { StatCard } from "../../_components/StatCard";
+import { TodaySchedule } from "../../_components/TodaySchedule";
 
 export const metadata: Metadata = { title: "Technician dashboard" };
+
+const isToday = (iso: string): boolean => {
+  const when = new Date(iso);
+  const now = new Date();
+  return (
+    when.getFullYear() === now.getFullYear() &&
+    when.getMonth() === now.getMonth() &&
+    when.getDate() === now.getDate()
+  );
+};
 
 export default async function TechnicianDashboardPage() {
   const [user, bookings] = await Promise.all([
@@ -32,25 +43,33 @@ export default async function TechnicianDashboardPage() {
   const profile = user.technicianProfile;
 
   const pending = bookings.filter((booking) => booking.status === "REQUESTED");
-  const upcoming = bookings.filter((booking) =>
-    ["PAID", "IN_PROGRESS"].includes(booking.status),
+
+  // Today's board — the handoff leads with what's happening in the next
+  // few hours, not lifetime totals.
+  const todayJobs = bookings
+    .filter((booking) => isToday(booking.scheduledAt))
+    .filter((booking) => !["CANCELLED", "DECLINED"].includes(booking.status));
+
+  const expectedToday = todayJobs.reduce(
+    (sum, booking) => sum + toNumber(booking.totalAmount),
+    0,
   );
 
-  // Earnings recognised on completion — the money the platform owes them.
-  const earnings = bookings
-    .filter((booking) => booking.status === "COMPLETED")
-    .reduce((sum, booking) => sum + toNumber(booking.totalAmount), 0);
-
-  const isProfileIncomplete = !profile?.location || !profile?.bio;
+  const performance = technicianPerformance(bookings);
+  const acceptance = performance?.[0];
 
   const weekEarnings = earningsByDay(bookings, 7);
-  const performance = technicianPerformance(bookings);
+  const isProfileIncomplete = !profile?.location || !profile?.bio;
 
   return (
     <>
       <PageHeader
-        title={`Welcome back, ${user.name.split(" ")[0]}`}
-        description="Requests, jobs in flight and what you've earned."
+        title="Today's board"
+        description={
+          todayJobs.length > 0
+            ? `${todayJobs.length} job${todayJobs.length === 1 ? "" : "s"} scheduled today · ${formatCurrency(expectedToday)} expected.`
+            : "Nothing booked for today. Requests and jobs in flight are below."
+        }
         action={
           <Button variant="outline" asChild>
             <Link href="/dashboard/technician/availability">
@@ -61,11 +80,13 @@ export default async function TechnicianDashboardPage() {
       />
 
       {isProfileIncomplete && (
-        <Card className="mb-6 border-accent/40 bg-accent/10">
+        <Card className="mb-6 border-amber-border bg-amber-soft">
           <CardContent className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <p className="font-medium">Your profile is incomplete</p>
-              <p className="text-sm text-muted-foreground">
+              <p className="font-semibold text-text">
+                Your profile is incomplete
+              </p>
+              <p className="text-body2 text-text2">
                 Customers filter by location and read your bio before booking.
               </p>
             </div>
@@ -76,33 +97,43 @@ export default async function TechnicianDashboardPage() {
         </Card>
       )}
 
+      {/* Stat labels follow the handoff: today first, then standing. */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
-          icon={BellRingIcon}
-          label="Pending requests"
-          value={pending.length}
-          hint={pending.length > 0 ? "Waiting on your reply" : undefined}
-        />
-        <StatCard
-          icon={CalendarCheckIcon}
-          label="Jobs in progress"
-          value={upcoming.length}
+          icon={BriefcaseIcon}
+          label="Jobs today"
+          value={todayJobs.length}
+          hint={
+            pending.length > 0
+              ? `${pending.length} request${pending.length === 1 ? "" : "s"} waiting`
+              : "No requests waiting"
+          }
         />
         <StatCard
           icon={WalletIcon}
-          label="Total earned"
-          value={formatCurrency(earnings)}
-          hint="From completed jobs"
+          label="Expected today"
+          value={formatCurrency(expectedToday)}
+        />
+        <StatCard
+          icon={CheckCheckIcon}
+          label="Acceptance rate"
+          value={acceptance ? acceptance.display : "—"}
+          hint={acceptance ? undefined : "No requests yet"}
         />
         <StatCard
           icon={StarIcon}
-          label="Average rating"
+          label="Rating"
           value={profile ? formatRating(profile.avgRating) : "—"}
         />
       </div>
 
-      {/* Earnings + performance — the handoff's 1.4fr / 1fr split. */}
+      {/* Requests + schedule — the handoff's 1.4fr / 1fr split. */}
       <div className="mt-6 grid gap-5 lg:grid-cols-[1.4fr_1fr]">
+        <IncomingRequests bookings={bookings} />
+        <TodaySchedule bookings={bookings} />
+      </div>
+
+      <div className="mt-5 grid gap-5 lg:grid-cols-2">
         <section className="rounded-panel border border-line bg-surface p-[22px] shadow-sh2">
           <div className="mb-5 flex items-center justify-between gap-3">
             <h2 className="text-panel text-text">Earnings, last 7 days</h2>
@@ -113,7 +144,7 @@ export default async function TechnicianDashboardPage() {
         </section>
 
         <section className="rounded-panel border border-line bg-surface p-[22px] shadow-sh2">
-          <h2 className="mb-5 text-panel text-text">Performance</h2>
+          <h2 className="mb-5 text-panel text-text">Your performance</h2>
 
           {performance ? (
             <MetricBars metrics={performance} />
@@ -124,23 +155,6 @@ export default async function TechnicianDashboardPage() {
           )}
         </section>
       </div>
-
-      <section className="mt-8">
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-panel text-text">Incoming requests</h2>
-          <Button variant="outline" size="sm" asChild>
-            <Link href="/dashboard/technician/bookings">View all jobs</Link>
-          </Button>
-        </div>
-
-        <BookingsTable
-          showTabs={false}
-          bookings={pending.length > 0 ? pending : bookings.slice(0, 5)}
-          variant="technician"
-          emptyTitle="No jobs yet"
-          emptyDescription="Once your services are listed and your calendar is open, requests land here."
-        />
-      </section>
     </>
   );
 }
