@@ -44,9 +44,14 @@ export function DashboardSidebar({ user }: { user: IUser }) {
          * and nesting one <a> inside another is invalid HTML that React
          * reports as a hydration error.
          */}
-        <div className="flex items-center gap-2.5 overflow-hidden">
+        {/*
+         * Logo above, role label under it — beside the logo the label had no
+         * room and truncated to "Administrat…". Stacking also matches the
+         * handoff's brand block, which puts the role under the wordmark.
+         */}
+        <div className="flex flex-col items-start gap-1.5 overflow-hidden">
           <Logo />
-          <span className="min-w-0 truncate text-[11.5px] font-medium text-text3 group-data-[collapsible=icon]:hidden">
+          <span className="min-w-0 truncate text-[13px] font-semibold text-text3 group-data-[collapsible=icon]:hidden">
             {ROLE_LABEL[user.role]}
           </span>
         </div>
