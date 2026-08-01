@@ -14,7 +14,10 @@ import {
 } from "@/components/design/data-table";
 import { Money, Mono } from "@/components/design/money";
 import { EmptyState } from "@/components/shared/empty-state";
-import { BookingStatusBadge } from "@/components/shared/status-badge";
+import {
+  BookingStatusBadge,
+  PaymentStatusBadge,
+} from "@/components/shared/status-badge";
 import { Button } from "@/components/ui/button";
 import { formatDateTime } from "@/lib/format";
 import { IBooking, IBookingStatus } from "@/lib/types";
@@ -41,7 +44,9 @@ const PER_PAGE = 8;
 const TEMPLATES: Record<Variant, string> = {
   customer: "1.5fr 1fr 1fr .7fr .8fr auto",
   technician: "1.5fr 1.1fr 1fr .7fr .8fr auto",
-  admin: "1.4fr 1fr 1fr 1fr .7fr .8fr",
+  // Admin gets a payment column: admin bookings come back with `payment`
+  // included, which is the only place the gateway state is visible.
+  admin: "1.3fr .9fr .9fr .9fr .7fr .8fr .8fr",
 };
 
 const TABS: { label: string; match: (status: IBookingStatus) => boolean }[] = [
@@ -178,6 +183,7 @@ export function BookingsTable({
           <DataTableTh>Scheduled</DataTableTh>
           <DataTableTh>Amount</DataTableTh>
           <DataTableTh>Status</DataTableTh>
+          {variant === "admin" && <DataTableTh>Payment</DataTableTh>}
           {showActions && (
             <DataTableTh className="text-right">Actions</DataTableTh>
           )}
@@ -256,6 +262,21 @@ export function BookingsTable({
               <DataTableCell label="Status">
                 <BookingStatusBadge status={booking.status} />
               </DataTableCell>
+
+              {variant === "admin" && (
+                <DataTableCell label="Payment">
+                  {booking.payment ? (
+                    <span className="flex flex-wrap items-center gap-1.5">
+                      <PaymentStatusBadge status={booking.payment.status} />
+                      <span className="text-[11.5px] text-text3">
+                        {booking.payment.provider}
+                      </span>
+                    </span>
+                  ) : (
+                    <span className="text-[12px] text-text3">Not started</span>
+                  )}
+                </DataTableCell>
+              )}
 
               {showActions && (
                 <DataTableCell className="md:text-right">
