@@ -2,7 +2,7 @@
 
 import { Loader2Icon, SearchIcon, SearchXIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -37,14 +37,16 @@ export function CommandPalette({ role }: { role: IRole }) {
   const [query, setQuery] = useState("");
   const [hits, setHits] = useState<SearchHit[]>([]);
   const [active, setActive] = useState(0);
-  const [isPending, startTransition] = useTransition();
+  const [loading, setLoading] = useState(false);
 
-  // Mac shows ⌘, everything else Ctrl. Resolved after mount so the server and
-  // client render the same markup.
-  const [isMac, setIsMac] = useState(false);
-  useEffect(() => {
-    setIsMac(navigator.platform.toUpperCase().includes("MAC"));
-  }, []);
+  // Mac shows ⌘, everything else Ctrl. Read once at first render rather than
+  // in an effect; the server can't know the platform, so the one node whose
+  // text differs carries suppressHydrationWarning below.
+  const [isMac] = useState(
+    () =>
+      typeof navigator !== "undefined" &&
+      /mac/i.test(navigator.platform || navigator.userAgent),
+  );
 
   // Global shortcut.
   useEffect(() => {
@@ -62,6 +64,14 @@ export function CommandPalette({ role }: { role: IRole }) {
   // Debounce so a fast typist doesn't fan out a request per keystroke.
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  /*
+   * Every search carries a sequence number and only the newest one is allowed
+   * to write results. Without this, a slow query that was typed first can
+   * land after a fast one typed later and overwrite it — searching "clean"
+   * right after "sofa" would show sofa's results, or none at all.
+   */
+  const seq = useRef(0);
+
   const runSearch = (value: string) => {
     setQuery(value);
     setActive(0);
@@ -69,14 +79,27 @@ export function CommandPalette({ role }: { role: IRole }) {
     if (timer.current) clearTimeout(timer.current);
 
     if (value.trim().length < 2) {
+      seq.current += 1; // cancel anything in flight
       setHits([]);
+      setLoading(false);
       return;
     }
 
     timer.current = setTimeout(() => {
-      startTransition(async () => {
-        setHits(await dashboardSearch(value, role));
-      });
+      const id = ++seq.current;
+      setLoading(true);
+
+      dashboardSearch(value, role)
+        .then((results) => {
+          if (id !== seq.current) return; // superseded by a newer query
+          setHits(results);
+          setLoading(false);
+        })
+        .catch(() => {
+          if (id !== seq.current) return;
+          setHits([]);
+          setLoading(false);
+        });
     }, 250);
   };
 
@@ -121,7 +144,10 @@ export function CommandPalette({ role }: { role: IRole }) {
         <span className="flex-1 truncate text-body2 text-text3">
           Search bookings, technicians
         </span>
-        <kbd className="shrink-0 rounded border border-line bg-surface px-1.5 py-0.5 font-mono text-[11px] text-text3">
+        <kbd
+          suppressHydrationWarning
+          className="shrink-0 rounded border border-line bg-surface px-1.5 py-0.5 font-mono text-[11px] text-text3"
+        >
           {keyCap}
         </kbd>
       </button>
@@ -157,7 +183,7 @@ export function CommandPalette({ role }: { role: IRole }) {
               aria-label="Search"
               className="h-12 border-0 bg-transparent px-0 text-body focus-visible:shadow-none"
             />
-            {isPending && (
+            {loading && (
               <Loader2Icon
                 aria-hidden="true"
                 className="size-4 shrink-0 animate-spin text-text3"
