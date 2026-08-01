@@ -8,6 +8,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { formatCurrency, toNumber } from "@/lib/format";
+import { getMe } from "@/service/getMe";
 import { getMyBookings } from "../../_actions/bookingActions";
 import { getMyPayments } from "../../_actions/paymentActions";
 import { ActiveBookingPanel } from "../../_components/ActiveBookingPanel";
@@ -18,8 +19,17 @@ import { StatCard } from "../../_components/StatCard";
 
 export const metadata: Metadata = { title: "Customer dashboard" };
 
+/** "Good morning / afternoon / evening", per the handoff's greeting. */
+const greeting = (): string => {
+  const hour = new Date().getHours();
+  if (hour < 12) return "Good morning";
+  if (hour < 18) return "Good afternoon";
+  return "Good evening";
+};
+
 export default async function CustomerDashboardPage() {
-  const [bookings, payments] = await Promise.all([
+  const [user, bookings, payments] = await Promise.all([
+    getMe(),
     getMyBookings(),
     getMyPayments(),
   ]);
@@ -27,18 +37,37 @@ export default async function CustomerDashboardPage() {
   const active = bookings.filter((booking) =>
     ["REQUESTED", "ACCEPTED", "PAID", "IN_PROGRESS"].includes(booking.status),
   );
+  const completed = bookings.filter(
+    (booking) => booking.status === "COMPLETED",
+  );
   const awaitingPayment = bookings.filter(
     (booking) => booking.status === "ACCEPTED",
   );
-  const totalSpent = payments
-    .filter((payment) => payment.status === "COMPLETED")
+
+  const settled = payments.filter(
+    (payment) => payment.status === "COMPLETED",
+  );
+
+  // "Spent this year" rather than all-time — the handoff's framing, and the
+  // more useful number once an account is a few years old.
+  const thisYear = new Date().getFullYear();
+  const spentThisYear = settled
+    .filter(
+      (payment) =>
+        new Date(payment.paidAt ?? payment.createdAt).getFullYear() ===
+        thisYear,
+    )
     .reduce((sum, payment) => sum + toNumber(payment.amount), 0);
 
   return (
     <>
       <PageHeader
-        title="Your bookings at a glance"
-        description="Track every job from request to review."
+        title={`${greeting()}${user ? `, ${user.name.split(" ")[0]}` : ""}`}
+        description={
+          active.length > 0
+            ? `${active.length} job${active.length === 1 ? "" : "s"} in flight. Track them below.`
+            : "Nothing in flight right now. Browse services to book your next job."
+        }
         action={
           <Button asChild>
             <Link href="/services">Book a new service</Link>
@@ -48,21 +77,34 @@ export default async function CustomerDashboardPage() {
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
-          icon={ClipboardListIcon}
-          label="Total bookings"
-          value={bookings.length}
+          icon={ClockIcon}
+          label="Active bookings"
+          value={active.length}
+          hint={
+            awaitingPayment.length > 0
+              ? `${awaitingPayment.length} waiting on payment`
+              : undefined
+          }
         />
-        <StatCard icon={ClockIcon} label="Active jobs" value={active.length} />
         <StatCard
-          icon={CreditCardIcon}
-          label="Awaiting payment"
-          value={awaitingPayment.length}
-          hint={awaitingPayment.length > 0 ? "Accepted — pay to confirm" : undefined}
+          icon={ClipboardListIcon}
+          label="Completed"
+          value={completed.length}
         />
         <StatCard
           icon={WalletIcon}
-          label="Total spent"
-          value={formatCurrency(totalSpent)}
+          label={`Spent in ${thisYear}`}
+          value={formatCurrency(spentThisYear)}
+        />
+        {/*
+         * The handoff's fourth card is "Saved with promos". There is no promo
+         * or discount model on this API, so this shows the payment count —
+         * a number the receipts can actually back up.
+         */}
+        <StatCard
+          icon={CreditCardIcon}
+          label="Payments made"
+          value={settled.length}
         />
       </div>
 
