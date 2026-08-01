@@ -45,3 +45,29 @@ next-env.d.ts
 
 # ...but the template belongs in the repo.
 !.env.example
+
+# local development / editor files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# local caches and temporary files
+.cache/
+.tmp/
+.tmp/
+tmp/
+temp/
+
+# package manager / build caches
+.pnpm-store/
+.turbo/
+.eslintcache
+.parcel-cache/
+
+.agents
+.claude
+.CLAUDE.md
