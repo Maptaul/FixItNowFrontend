@@ -29,15 +29,18 @@ export function Money({
   );
 }
 
-/** Mono treatment for IDs, reference numbers and counts. */
+/**
+ * Mono treatment for IDs, reference numbers, dates in tables and counts.
+ * Accepts the usual span props so a truncated reference can carry a `title`.
+ */
 export function Mono({
   children,
   className,
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) {
+  ...props
+}: React.ComponentProps<"span">) {
   return (
-    <span className={cn("font-mono tabular-nums", className)}>{children}</span>
+    <span className={cn("font-mono tabular-nums", className)} {...props}>
+      {children}
+    </span>
   );
 }

@@ -1,81 +1,110 @@
-import { ReceiptTextIcon } from "lucide-react";
-import { Metadata } from "next";
-import { EmptyState } from "@/components/shared/empty-state";
-import { PaymentStatusBadge } from "@/components/shared/status-badge";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { formatCurrency, formatDateTime } from "@/lib/format";
+  ClockIcon,
+  CreditCardIcon,
+  ShieldCheckIcon,
+  WalletIcon,
+} from "lucide-react";
+import { Metadata } from "next";
+import { formatCurrency, toNumber } from "@/lib/format";
 import { getMyPayments } from "../../../_actions/paymentActions";
 import { PageHeader } from "../../../_components/PageHeader";
+import { PaymentsTable } from "../../../_components/PaymentsTable";
+import { StatCard } from "../../../_components/StatCard";
 
 export const metadata: Metadata = { title: "Payment history" };
 
 export default async function CustomerPaymentsPage() {
   const payments = await getMyPayments();
 
+  const settled = payments.filter((payment) => payment.status === "COMPLETED");
+  const clearing = payments.filter((payment) => payment.status === "PENDING");
+
+  const spent = settled.reduce(
+    (sum, payment) => sum + toNumber(payment.amount),
+    0,
+  );
+
   return (
     <>
       <PageHeader
-        title="Payment history"
-        description="Every Stripe charge against your bookings."
+        title="Payments"
+        description="Every Stripe charge against your bookings, with the reference you'd quote to support."
       />
 
-      {payments.length === 0 ? (
-        <EmptyState
-          icon={ReceiptTextIcon}
-          title="No payments yet"
-          description="Once you pay for an accepted booking, the receipt shows up here."
+      {/*
+       * The handoff's third stat card is "pending refund". The API has no
+       * refund model, so this shows what's still clearing instead — a number
+       * we can actually stand behind.
+       */}
+      <div className="grid gap-4 sm:grid-cols-3">
+        <StatCard
+          icon={WalletIcon}
+          label="Total spent"
+          value={formatCurrency(spent)}
+          hint={`${settled.length} settled payment${settled.length === 1 ? "" : "s"}`}
         />
-      ) : (
-        <div className="rounded-xl border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Service</TableHead>
-                <TableHead>Amount</TableHead>
-                <TableHead>Provider</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Paid at</TableHead>
-                <TableHead>Transaction</TableHead>
-              </TableRow>
-            </TableHeader>
+        <StatCard
+          icon={CreditCardIcon}
+          label="Payments made"
+          value={payments.length}
+        />
+        <StatCard
+          icon={ClockIcon}
+          label="Clearing"
+          value={clearing.length}
+          hint={clearing.length > 0 ? "Awaiting Stripe confirmation" : undefined}
+        />
+      </div>
 
-            <TableBody>
-              {payments.map((payment) => (
-                <TableRow key={payment.id}>
-                  <TableCell className="font-medium">
-                    {payment.booking?.service?.title ?? "Booking"}
-                  </TableCell>
-                  <TableCell className="font-medium tabular-nums">
-                    {formatCurrency(payment.amount)}
-                  </TableCell>
-                  <TableCell className="text-muted-foreground">
-                    {payment.provider}
-                  </TableCell>
-                  <TableCell>
-                    <PaymentStatusBadge status={payment.status} />
-                  </TableCell>
-                  <TableCell className="text-muted-foreground">
-                    {payment.paidAt ? formatDateTime(payment.paidAt) : "—"}
-                  </TableCell>
-                  <TableCell
-                    className="max-w-40 truncate font-mono text-xs text-muted-foreground"
-                    title={payment.transactionId ?? undefined}
-                  >
-                    {payment.transactionId ?? "—"}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+      <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_340px]">
+        <div className="min-w-0">
+          <PaymentsTable payments={payments} />
         </div>
-      )}
+
+        {/*
+         * The handoff puts a saved-payment-methods panel here. Checkout is
+         * hosted by Stripe and this app never sees or stores a card, so
+         * there's nothing to list — this explains the flow instead of
+         * inventing a wallet.
+         */}
+        <aside className="h-fit rounded-panel border border-line bg-surface p-5 shadow-sh2">
+          <h2 className="mb-3 text-panel text-text">How payment works</h2>
+
+          <ol className="space-y-3.5">
+            {[
+              {
+                icon: ClockIcon,
+                title: "Nothing upfront",
+                body: "Requesting a booking charges you nothing. Payment only opens once your technician accepts.",
+              },
+              {
+                icon: CreditCardIcon,
+                title: "Paid through Stripe",
+                body: "You're redirected to Stripe's hosted checkout. Card details never touch FixItNow.",
+              },
+              {
+                icon: ShieldCheckIcon,
+                title: "Tracked to done",
+                body: "Once paid, the booking moves to Paid and your technician can start the job.",
+              },
+            ].map((step) => (
+              <li key={step.title} className="flex gap-3">
+                <span className="grid size-8 shrink-0 place-items-center rounded-md bg-primary-soft text-primary">
+                  <step.icon aria-hidden="true" className="size-4" />
+                </span>
+                <span className="min-w-0">
+                  <span className="block text-body2 font-semibold text-text">
+                    {step.title}
+                  </span>
+                  <span className="mt-0.5 block text-caption text-text2">
+                    {step.body}
+                  </span>
+                </span>
+              </li>
+            ))}
+          </ol>
+        </aside>
+      </div>
     </>
   );
 }
