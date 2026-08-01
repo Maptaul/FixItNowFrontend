@@ -98,14 +98,38 @@ export const PAGE_SIZE = 9;
  * the right picture; anything unmatched falls back to the generic photo.
  */
 const CATEGORY_IMAGES: { keyword: string; url: string }[] = [
-  { keyword: "plumb", url: "https://images.unsplash.com/photo-1607472586893-edb57bdc0e39" },
-  { keyword: "electric", url: "https://images.unsplash.com/photo-1621905251189-08b45d6a269e" },
-  { keyword: "clean", url: "https://images.unsplash.com/photo-1581578731548-c64695cc6952" },
-  { keyword: "carpen", url: "https://images.unsplash.com/photo-1504148455328-c376907d081c" },
-  { keyword: "paint", url: "https://images.unsplash.com/photo-1562259949-e8e7689d7828" },
-  { keyword: "garden", url: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b" },
-  { keyword: "ac ", url: "https://images.unsplash.com/photo-1631545806609-8b1a2e0f1d0f" },
-  { keyword: "hvac", url: "https://images.unsplash.com/photo-1631545806609-8b1a2e0f1d0f" },
+  {
+    keyword: "plumb",
+    url: "https://images.unsplash.com/photo-1607472586893-edb57bdc0e39",
+  },
+  {
+    keyword: "electric",
+    url: "https://images.unsplash.com/photo-1621905251189-08b45d6a269e",
+  },
+  {
+    keyword: "clean",
+    url: "https://images.unsplash.com/photo-1581578731548-c64695cc6952",
+  },
+  {
+    keyword: "carpen",
+    url: "https://images.unsplash.com/photo-1504148455328-c376907d081c",
+  },
+  {
+    keyword: "paint",
+    url: "https://images.unsplash.com/photo-1562259949-e8e7689d7828",
+  },
+  {
+    keyword: "garden",
+    url: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b",
+  },
+  {
+    keyword: "ac ",
+    url: "https://images.unsplash.com/photo-1581092160562-40aa08e78837",
+  },
+  {
+    keyword: "hvac",
+    url: "https://images.unsplash.com/photo-1581092160562-40aa08e78837",
+  },
 ];
 
 const FALLBACK_CATEGORY_IMAGE =
