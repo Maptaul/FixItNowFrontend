@@ -44,7 +44,14 @@ const STATUS_LABEL: Record<string, string> = {
  * a customer would quote to support — the internal payment id means nothing
  * to them.
  */
-export function PaymentsTable({ payments }: { payments: IPayment[] }) {
+export function PaymentsTable({
+  payments,
+  /** Admins see who paid; a customer only ever sees their own. */
+  showCustomer = false,
+}: {
+  payments: IPayment[];
+  showCustomer?: boolean;
+}) {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<IPaymentStatus | "ALL">("ALL");
   const [page, setPage] = useState(1);
@@ -60,6 +67,8 @@ export function PaymentsTable({ payments }: { payments: IPayment[] }) {
         payment.booking?.service?.title,
         payment.transactionId,
         payment.provider,
+        payment.booking?.customer?.name,
+        payment.booking?.customer?.email,
       ]
         .filter(Boolean)
         .some((field) => field!.toLowerCase().includes(query));
@@ -84,7 +93,13 @@ export function PaymentsTable({ payments }: { payments: IPayment[] }) {
   }
 
   return (
-    <DataTableCard template="1.4fr 1fr .8fr .8fr .8fr">
+    <DataTableCard
+      template={
+        showCustomer
+          ? "1.3fr 1fr 1fr .7fr .8fr .8fr"
+          : "1.4fr 1fr .8fr .8fr .8fr"
+      }
+    >
       <DataTableFilterBar
         search={search}
         onSearchChange={(value) => {
@@ -111,6 +126,7 @@ export function PaymentsTable({ payments }: { payments: IPayment[] }) {
 
       <DataTableHead>
         <DataTableTh>Service</DataTableTh>
+        {showCustomer && <DataTableTh>Customer</DataTableTh>}
         <DataTableTh>Reference</DataTableTh>
         <DataTableTh>Gateway</DataTableTh>
         <DataTableTh>Status</DataTableTh>
@@ -134,6 +150,19 @@ export function PaymentsTable({ payments }: { payments: IPayment[] }) {
                   : formatDate(payment.createdAt)}
               </Mono>
             </DataTableCell>
+
+            {showCustomer && (
+              <DataTableCell label="Customer">
+                <p className="truncate text-text2">
+                  {payment.booking?.customer?.name ?? "—"}
+                </p>
+                {payment.booking?.customer?.email && (
+                  <p className="truncate text-[12px] text-text3">
+                    {payment.booking.customer.email}
+                  </p>
+                )}
+              </DataTableCell>
+            )}
 
             <DataTableCell label="Reference">
               <Mono
