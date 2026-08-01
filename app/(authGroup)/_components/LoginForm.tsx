@@ -1,13 +1,13 @@
 "use client";
 
+import { Field, FormAlert, SubmitButton } from "@/components/shared/form";
+import { Input } from "@/components/ui/input";
+import { IFormState } from "@/lib/types";
 import { CheckCircle2Icon } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useActionState, useEffect } from "react";
 import { toast } from "sonner";
-import { Field, FormAlert, SubmitButton } from "@/components/shared/form";
-import { Input } from "@/components/ui/input";
-import { IFormState } from "@/lib/types";
 import { loginAction } from "../_actions/authActions";
 
 /** Demo accounts, so a reviewer can get in without creating anything. */
@@ -92,7 +92,7 @@ export function LoginForm() {
         </Link>
       </p>
 
-      <div className="rounded-lg border border-dashed p-3">
+      {/* <div className="rounded-lg border border-dashed p-3">
         <p className="text-xs font-medium text-muted-foreground">
           Reviewer credentials
         </p>
@@ -106,7 +106,7 @@ export function LoginForm() {
             </li>
           ))}
         </ul>
-      </div>
+      </div> */}
     </div>
   );
 }

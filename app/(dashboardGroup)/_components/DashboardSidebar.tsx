@@ -1,8 +1,6 @@
 "use client";
 
-import { HomeIcon, LogOutIcon, PanelLeftIcon } from "lucide-react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { Logo } from "@/components/shared/logo";
 import {
   Sidebar,
   SidebarContent,
@@ -17,6 +15,9 @@ import {
 } from "@/components/ui/sidebar";
 import { IUser } from "@/lib/types";
 import { logout } from "@/service/logout";
+import { HomeIcon, LogOutIcon, PanelLeftIcon } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { ROLE_LABEL, SIDEBAR_ITEMS } from "../_config/sidebarMenuItems";
 
 /**
@@ -38,14 +39,9 @@ export function DashboardSidebar({ user }: { user: IUser }) {
   return (
     <Sidebar collapsible="icon" className="border-line">
       <SidebarHeader className="border-b border-line px-3 py-4">
-        <Link href="/" className="flex items-center gap-2.5 overflow-hidden">
-          <span className="grid size-8 shrink-0 place-items-center rounded-md bg-primary text-[15px] font-extrabold text-primary-foreground">
-            F
-          </span>
+        <Link href="/" className="flex-2 items-center gap-2.5 overflow-hidden">
+          <Logo />
           <span className="min-w-0 group-data-[collapsible=icon]:hidden">
-            <span className="block truncate text-[15px] font-extrabold tracking-[-0.03em] text-text">
-              FixItNow
-            </span>
             <span className="block truncate text-[11.5px] font-medium text-text3">
               {ROLE_LABEL[user.role]}
             </span>
