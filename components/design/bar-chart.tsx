@@ -81,7 +81,7 @@ export type Metric = {
   display: string;
   /** Share of the track to fill, 0–100. Defaults to `value`. */
   pct?: number;
-  tone?: "emerald" | "primary" | "amber" | "red";
+  tone?: "emerald" | "primary" | "amber" | "red" | "violet";
 };
 
 const TONE_FILL: Record<NonNullable<Metric["tone"]>, string> = {
@@ -89,6 +89,7 @@ const TONE_FILL: Record<NonNullable<Metric["tone"]>, string> = {
   primary: "bg-primary",
   amber: "bg-amber",
   red: "bg-red",
+  violet: "bg-violet",
 };
 
 export function MetricBars({

@@ -1,7 +1,7 @@
 import { Bar, Metric } from "@/components/design/bar-chart";
 import { BOOKING_STATUS_META } from "./constants";
 import { formatCurrency, toNumber } from "./format";
-import { IBooking, IBookingStatus } from "./types";
+import { IBooking, IBookingStatus, IPayment, IUser } from "./types";
 
 /**
  * Chart data derived from bookings.
@@ -220,6 +220,156 @@ export function busiestHours(bookings: IBooking[], limit = 5): Metric[] {
     pct: max === 0 ? 0 : (value / max) * 100,
     tone: "emerald" as const,
   }));
+}
+
+/**
+ * Bookings by status as horizontal bars with a count — the handoff's admin
+ * treatment, which reads far better than a column chart when the categories
+ * are named states rather than a time series.
+ */
+export function statusSplit(bookings: IBooking[]): Metric[] {
+  const rows: { label: string; match: IBookingStatus[]; tone: Metric["tone"] }[] =
+    [
+      { label: "Completed", match: ["COMPLETED"], tone: "emerald" },
+      { label: "In progress", match: ["IN_PROGRESS", "PAID"], tone: "primary" },
+      { label: "Pending accept", match: ["REQUESTED"], tone: "amber" },
+      { label: "Accepted", match: ["ACCEPTED"], tone: "violet" },
+      { label: "Cancelled", match: ["CANCELLED", "DECLINED"], tone: "red" },
+    ];
+
+  const max = Math.max(
+    ...rows.map(
+      (row) =>
+        bookings.filter((booking) => row.match.includes(booking.status)).length,
+    ),
+    1,
+  );
+
+  return rows.map((row) => {
+    const value = bookings.filter((booking) =>
+      row.match.includes(booking.status),
+    ).length;
+
+    return {
+      label: row.label,
+      value,
+      display: String(value),
+      pct: (value / max) * 100,
+      tone: row.tone,
+    };
+  });
+}
+
+/**
+ * Period-over-period change, e.g. the last 30 days against the 30 before it.
+ * Returns `null` when there's no prior period to compare against — a "+100%"
+ * badge on a platform's first month is noise, not insight.
+ */
+export function periodDelta(
+  bookings: IBooking[],
+  days = 30,
+  value: (booking: IBooking) => number = () => 1,
+): { current: number; previous: number; pct: number } | null {
+  const now = Date.now();
+  const window = days * 24 * 60 * 60 * 1000;
+
+  let current = 0;
+  let previous = 0;
+
+  for (const booking of bookings) {
+    const age = now - new Date(booking.createdAt).getTime();
+    if (age < 0) continue;
+
+    if (age <= window) current += value(booking);
+    else if (age <= window * 2) previous += value(booking);
+  }
+
+  if (previous === 0) return null;
+
+  return {
+    current,
+    previous,
+    pct: Math.round(((current - previous) / previous) * 1000) / 10,
+  };
+}
+
+export type ActivityItem = {
+  id: string;
+  text: string;
+  at: string;
+  tone: "emerald" | "primary" | "amber" | "red" | "violet";
+};
+
+/**
+ * Recent activity feed — design handoff § Admin › Overview.
+ *
+ * The API has no event log, so this reconstructs one from the timestamps
+ * records already carry: bookings when they were placed, payments when they
+ * settled, users when they joined. It's a genuine history, just derived —
+ * which also means it can only show what those three resources record.
+ */
+export function recentActivity(
+  bookings: IBooking[],
+  payments: IPayment[],
+  users: IUser[],
+  limit = 8,
+): ActivityItem[] {
+  const items: ActivityItem[] = [];
+
+  for (const booking of bookings) {
+    items.push({
+      id: `b-${booking.id}`,
+      text: `${booking.customer?.name ?? "A customer"} booked ${booking.service?.title ?? "a service"}`,
+      at: booking.createdAt,
+      tone: "primary",
+    });
+
+    if (booking.status === "COMPLETED") {
+      items.push({
+        id: `bc-${booking.id}`,
+        text: `${booking.technician?.user?.name ?? "A technician"} completed ${booking.service?.title ?? "a job"}`,
+        at: booking.updatedAt,
+        tone: "emerald",
+      });
+    }
+
+    if (["CANCELLED", "DECLINED"].includes(booking.status)) {
+      items.push({
+        id: `bx-${booking.id}`,
+        text: `${booking.service?.title ?? "A booking"} was ${booking.status.toLowerCase()}`,
+        at: booking.updatedAt,
+        tone: "red",
+      });
+    }
+  }
+
+  for (const payment of payments) {
+    if (payment.status !== "COMPLETED" || !payment.paidAt) continue;
+
+    items.push({
+      id: `p-${payment.id}`,
+      text: `Payment of ${formatCurrency(payment.amount)} settled for ${payment.booking?.service?.title ?? "a booking"}`,
+      at: payment.paidAt,
+      tone: "violet",
+    });
+  }
+
+  for (const user of users) {
+    items.push({
+      id: `u-${user.id}`,
+      text:
+        user.activeStatus === "BLOCKED"
+          ? `${user.name} is banned`
+          : `${user.name} joined as a ${user.role.toLowerCase()}`,
+      at: user.createdAt,
+      tone: user.activeStatus === "BLOCKED" ? "red" : "amber",
+    });
+  }
+
+  return items
+    .filter((item) => !Number.isNaN(Date.parse(item.at)))
+    .sort((a, b) => Date.parse(b.at) - Date.parse(a.at))
+    .slice(0, limit);
 }
 
 /** How the platform's bookings are distributed across the lifecycle. */
