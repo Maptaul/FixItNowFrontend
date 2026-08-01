@@ -1,4 +1,4 @@
-import { Bar } from "@/components/design/bar-chart";
+import { Bar, Metric } from "@/components/design/bar-chart";
 import { BOOKING_STATUS_META } from "./constants";
 import { formatCurrency, toNumber } from "./format";
 import { IBooking, IBookingStatus } from "./types";
@@ -123,6 +123,103 @@ export function earningsByMonth(
     }),
     total: [...money.values()].reduce((sum, value) => sum + value, 0),
   };
+}
+
+/** Jobs completed per week over the trailing `weeks` window. */
+export function jobsByWeek(bookings: IBooking[], weeks = 12): Bar[] {
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
+
+  // Monday-start week containing `date`.
+  const weekStart = (date: Date): Date => {
+    const copy = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    const day = (copy.getDay() + 6) % 7;
+    copy.setDate(copy.getDate() - day);
+    return copy;
+  };
+
+  const buckets = new Map<number, number>();
+  const window: Date[] = [];
+
+  for (let offset = weeks - 1; offset >= 0; offset -= 1) {
+    const start = weekStart(now);
+    start.setDate(start.getDate() - offset * 7);
+    window.push(start);
+    buckets.set(start.getTime(), 0);
+  }
+
+  for (const booking of bookings) {
+    if (booking.status !== "COMPLETED") continue;
+
+    const key = weekStart(new Date(booking.updatedAt)).getTime();
+    if (!buckets.has(key)) continue;
+    buckets.set(key, buckets.get(key)! + 1);
+  }
+
+  return window.map((start) => {
+    const value = buckets.get(start.getTime()) ?? 0;
+    return {
+      label: `${start.getDate()}/${start.getMonth() + 1}`,
+      value,
+      display: value === 0 ? "—" : String(value),
+    };
+  });
+}
+
+/** Money earned per service, biggest first — the handoff's revenue bars. */
+export function revenueByService(bookings: IBooking[], limit = 6): Metric[] {
+  const totals = new Map<string, number>();
+
+  for (const booking of bookings) {
+    if (!["PAID", "IN_PROGRESS", "COMPLETED"].includes(booking.status)) {
+      continue;
+    }
+
+    const title = booking.service?.title ?? "Other";
+    totals.set(title, (totals.get(title) ?? 0) + toNumber(booking.totalAmount));
+  }
+
+  const rows = [...totals.entries()].sort((a, b) => b[1] - a[1]).slice(0, limit);
+  const max = rows[0]?.[1] ?? 0;
+
+  return rows.map(([label, value]) => ({
+    label,
+    value,
+    display: formatCurrency(value),
+    // Bars are relative to the top earner, not to 100.
+    pct: max === 0 ? 0 : (value / max) * 100,
+    tone: "primary" as const,
+  }));
+}
+
+/**
+ * When customers actually book, by hour of the scheduled slot. Useful for
+ * deciding which hours to open on the availability calendar.
+ */
+export function busiestHours(bookings: IBooking[], limit = 5): Metric[] {
+  const counts = new Map<number, number>();
+
+  for (const booking of bookings) {
+    const hour = new Date(booking.scheduledAt).getHours();
+    counts.set(hour, (counts.get(hour) ?? 0) + 1);
+  }
+
+  const rows = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, limit);
+  const max = rows[0]?.[1] ?? 0;
+
+  const label = (hour: number) => {
+    const suffix = hour >= 12 ? "PM" : "AM";
+    const display = hour % 12 === 0 ? 12 : hour % 12;
+    return `${display}:00 ${suffix}`;
+  };
+
+  return rows.map(([hour, value]) => ({
+    label: label(hour),
+    value,
+    display: `${value} job${value === 1 ? "" : "s"}`,
+    pct: max === 0 ? 0 : (value / max) * 100,
+    tone: "emerald" as const,
+  }));
 }
 
 /** How the platform's bookings are distributed across the lifecycle. */
