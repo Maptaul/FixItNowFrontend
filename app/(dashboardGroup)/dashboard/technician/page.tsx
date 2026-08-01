@@ -7,8 +7,11 @@ import {
 import { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { BarChart, MetricBars } from "@/components/design/bar-chart";
+import { Money } from "@/components/design/money";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { earningsByDay, technicianPerformance } from "@/lib/analytics";
 import { formatCurrency, formatRating, toNumber } from "@/lib/format";
 import { getMe } from "@/service/getMe";
 import { getTechnicianBookings } from "../../_actions/bookingActions";
@@ -39,6 +42,9 @@ export default async function TechnicianDashboardPage() {
     .reduce((sum, booking) => sum + toNumber(booking.totalAmount), 0);
 
   const isProfileIncomplete = !profile?.location || !profile?.bio;
+
+  const weekEarnings = earningsByDay(bookings, 7);
+  const performance = technicianPerformance(bookings);
 
   return (
     <>
@@ -95,9 +101,33 @@ export default async function TechnicianDashboardPage() {
         />
       </div>
 
+      {/* Earnings + performance — the handoff's 1.4fr / 1fr split. */}
+      <div className="mt-6 grid gap-5 lg:grid-cols-[1.4fr_1fr]">
+        <section className="rounded-panel border border-line bg-surface p-[22px] shadow-sh2">
+          <div className="mb-5 flex items-center justify-between gap-3">
+            <h2 className="text-panel text-text">Earnings, last 7 days</h2>
+            <Money value={weekEarnings.total} className="text-[15px] font-bold" />
+          </div>
+
+          <BarChart bars={weekEarnings.bars} height={130} />
+        </section>
+
+        <section className="rounded-panel border border-line bg-surface p-[22px] shadow-sh2">
+          <h2 className="mb-5 text-panel text-text">Performance</h2>
+
+          {performance ? (
+            <MetricBars metrics={performance} />
+          ) : (
+            <p className="text-body2 text-text2">
+              Nothing to measure yet — your first few jobs will fill this in.
+            </p>
+          )}
+        </section>
+      </div>
+
       <section className="mt-8">
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-lg font-semibold">Incoming requests</h2>
+          <h2 className="text-panel text-text">Incoming requests</h2>
           <Button variant="outline" size="sm" asChild>
             <Link href="/dashboard/technician/bookings">View all jobs</Link>
           </Button>

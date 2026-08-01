@@ -9,6 +9,9 @@ import {
 import { Metadata } from "next";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { BarChart } from "@/components/design/bar-chart";
+import { Money } from "@/components/design/money";
+import { bookingsByStatus, earningsByDay } from "@/lib/analytics";
 import { formatCurrency, toNumber } from "@/lib/format";
 import { getAdminCategories, getAllBookings, getAllUsers } from "../../_actions/adminActions";
 import { BookingsTable } from "../../_components/BookingsTable";
@@ -37,6 +40,13 @@ export default async function AdminDashboardPage() {
       ["PAID", "IN_PROGRESS", "COMPLETED"].includes(booking.status),
     )
     .reduce((sum, booking) => sum + toNumber(booking.totalAmount), 0);
+
+  const statusBars = bookingsByStatus(bookings);
+  const weekRevenue = earningsByDay(bookings, 7, [
+    "PAID",
+    "IN_PROGRESS",
+    "COMPLETED",
+  ]);
 
   return (
     <>
@@ -86,9 +96,32 @@ export default async function AdminDashboardPage() {
         />
       </div>
 
+      {/* Volume + revenue — the handoff's 1.6fr / 1fr split. */}
+      <div className="mt-6 grid gap-5 lg:grid-cols-[1.6fr_1fr]">
+        <section className="rounded-panel border border-line bg-surface p-[22px] shadow-sh2">
+          <div className="mb-5 flex items-center justify-between gap-3">
+            <h2 className="text-panel text-text">Bookings by status</h2>
+            <span className="font-mono text-[15px] font-bold text-text">
+              {bookings.length}
+            </span>
+          </div>
+
+          <BarChart bars={statusBars} height={160} />
+        </section>
+
+        <section className="rounded-panel border border-line bg-surface p-[22px] shadow-sh2">
+          <div className="mb-5 flex items-center justify-between gap-3">
+            <h2 className="text-panel text-text">Revenue, last 7 days</h2>
+            <Money value={weekRevenue.total} className="text-[15px] font-bold" />
+          </div>
+
+          <BarChart bars={weekRevenue.bars} height={160} />
+        </section>
+      </div>
+
       <section className="mt-8">
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-lg font-semibold">Latest bookings</h2>
+          <h2 className="text-panel text-text">Latest bookings</h2>
           <Button variant="outline" size="sm" asChild>
             <Link href="/dashboard/admin/bookings">View all</Link>
           </Button>
