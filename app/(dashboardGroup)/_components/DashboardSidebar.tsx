@@ -39,14 +39,17 @@ export function DashboardSidebar({ user }: { user: IUser }) {
   return (
     <Sidebar collapsible="icon" className="border-line">
       <SidebarHeader className="border-b border-line px-3 py-4">
-        <Link href="/" className="flex-2 items-center gap-2.5 overflow-hidden">
+        {/*
+         * A div, not a Link — <Logo> already renders its own anchor to "/",
+         * and nesting one <a> inside another is invalid HTML that React
+         * reports as a hydration error.
+         */}
+        <div className="flex items-center gap-2.5 overflow-hidden">
           <Logo />
-          <span className="min-w-0 group-data-[collapsible=icon]:hidden">
-            <span className="block truncate text-[11.5px] font-medium text-text3">
-              {ROLE_LABEL[user.role]}
-            </span>
+          <span className="min-w-0 truncate text-[11.5px] font-medium text-text3 group-data-[collapsible=icon]:hidden">
+            {ROLE_LABEL[user.role]}
           </span>
-        </Link>
+        </div>
       </SidebarHeader>
 
       <SidebarContent>
