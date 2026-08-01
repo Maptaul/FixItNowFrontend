@@ -11,11 +11,11 @@ export const metadata: Metadata = {
   description: "Pick a service and a slot, and send your booking request.",
 };
 
-export default async function BookPage({
+const BookPage = async ({
   params,
 }: {
   params: Promise<{ technicianId: string }>;
-}) {
+}) => {
   const { technicianId } = await params;
 
   const [technician, me] = await Promise.all([
@@ -43,4 +43,6 @@ export default async function BookPage({
       </Suspense>
     </div>
   );
-}
+};
+
+export default BookPage;

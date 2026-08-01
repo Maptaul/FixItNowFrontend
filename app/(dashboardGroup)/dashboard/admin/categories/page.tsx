@@ -5,7 +5,7 @@ import { PageHeader } from "../../../_components/PageHeader";
 
 export const metadata: Metadata = { title: "Service categories" };
 
-export default async function AdminCategoriesPage() {
+const AdminCategoriesPage = async () => {
   const categories = await getAdminCategoryStats();
 
   return (
@@ -18,4 +18,6 @@ export default async function AdminCategoriesPage() {
       <CategoryManager categories={categories} />
     </>
   );
-}
+};
+
+export default AdminCategoriesPage;

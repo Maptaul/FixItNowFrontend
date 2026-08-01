@@ -112,7 +112,10 @@ const TRACKS = [
       "Accept or decline each request, then move the job to in-progress and complete.",
       "Your rating and reviews build on your public profile.",
     ],
-    cta: { href: "/auth/register?role=TECHNICIAN", label: "Join as a technician" },
+    cta: {
+      href: "/auth/register?role=TECHNICIAN",
+      label: "Join as a technician",
+    },
   },
 ];
 
@@ -149,7 +152,7 @@ const FAQ_ITEMS = [
   },
 ];
 
-export default function HowItWorksPage() {
+const HowItWorksPage = () => {
   return (
     <>
       {/* Header */}
@@ -206,8 +209,8 @@ export default function HowItWorksPage() {
             Every status, and who acts next
           </h2>
           <p className="mt-1.5 max-w-xl text-[15px] text-text2">
-            These are the real statuses on your booking — the same words you
-            see on your dashboard.
+            These are the real statuses on your booking — the same words you see
+            on your dashboard.
           </p>
 
           <ol className="mt-8 space-y-3">
@@ -266,7 +269,10 @@ export default function HowItWorksPage() {
 
               <ul className="mb-6 space-y-2.5">
                 {track.points.map((point) => (
-                  <li key={point} className="flex gap-2.5 text-body2 text-text2">
+                  <li
+                    key={point}
+                    className="flex gap-2.5 text-body2 text-text2"
+                  >
                     <span
                       aria-hidden="true"
                       className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary"
@@ -309,4 +315,6 @@ export default function HowItWorksPage() {
       </section>
     </>
   );
-}
+};
+
+export default HowItWorksPage;

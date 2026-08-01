@@ -7,7 +7,7 @@ import { UsersTable } from "../../../_components/UsersTable";
 
 export const metadata: Metadata = { title: "User management" };
 
-export default async function AdminUsersPage() {
+const AdminUsersPage = async () => {
   const [users, me] = await Promise.all([getAllUsers(), getMe()]);
 
   if (!me) redirect("/auth/login");
@@ -22,4 +22,6 @@ export default async function AdminUsersPage() {
       <UsersTable users={users} currentUserId={me.id} />
     </>
   );
-}
+};
+
+export default AdminUsersPage;

@@ -7,7 +7,7 @@ import { PageHeader } from "../../../_components/PageHeader";
 
 export const metadata: Metadata = { title: "My bookings" };
 
-export default async function CustomerBookingsPage() {
+const CustomerBookingsPage = async () => {
   const bookings = await getMyBookings();
 
   return (
@@ -30,4 +30,6 @@ export default async function CustomerBookingsPage() {
       />
     </>
   );
-}
+};
+
+export default CustomerBookingsPage;

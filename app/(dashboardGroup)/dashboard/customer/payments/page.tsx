@@ -13,7 +13,7 @@ import { StatCard } from "../../../_components/StatCard";
 
 export const metadata: Metadata = { title: "Payment history" };
 
-export default async function CustomerPaymentsPage() {
+const CustomerPaymentsPage = async () => {
   const payments = await getMyPayments();
 
   const settled = payments.filter((payment) => payment.status === "COMPLETED");
@@ -31,7 +31,6 @@ export default async function CustomerPaymentsPage() {
         description="Every Stripe charge against your bookings, with the reference you'd quote to support."
       />
 
-      
       <div className="grid gap-4 sm:grid-cols-3">
         <StatCard
           icon={WalletIcon}
@@ -48,7 +47,9 @@ export default async function CustomerPaymentsPage() {
           icon={ClockIcon}
           label="Clearing"
           value={clearing.length}
-          hint={clearing.length > 0 ? "Awaiting Stripe confirmation" : undefined}
+          hint={
+            clearing.length > 0 ? "Awaiting Stripe confirmation" : undefined
+          }
         />
       </div>
 
@@ -103,4 +104,6 @@ export default async function CustomerPaymentsPage() {
       </div>
     </>
   );
-}
+};
+
+export default CustomerPaymentsPage;

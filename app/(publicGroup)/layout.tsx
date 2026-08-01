@@ -1,11 +1,7 @@
 import { Footer } from "@/components/shared/footer";
 import { Navbar } from "@/components/shared/navbar";
 
-export default function PublicLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+const PublicLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <>
       <Navbar />
@@ -13,4 +9,6 @@ export default function PublicLayout({
       <Footer />
     </>
   );
-}
+};
+
+export default PublicLayout;

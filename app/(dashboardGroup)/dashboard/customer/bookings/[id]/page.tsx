@@ -16,7 +16,13 @@ import { CustomerBookingActions } from "../../../../_components/CustomerBookingA
 export const metadata: Metadata = { title: "Booking details" };
 
 /** Label / value pair in the job-details grid. */
-function Detail({ label, children }: { label: string; children: React.ReactNode }) {
+function Detail({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
   return (
     <div>
       <p className="text-th text-text3 uppercase">{label}</p>
@@ -25,11 +31,11 @@ function Detail({ label, children }: { label: string; children: React.ReactNode 
   );
 }
 
-export default async function BookingDetailsPage({
+const BookingDetailsPage = async ({
   params,
 }: {
   params: Promise<{ id: string }>;
-}) {
+}) => {
   const { id } = await params;
   const booking = await getBookingById(id);
 
@@ -87,9 +93,7 @@ export default async function BookingDetailsPage({
             <h2 className="mb-5 text-panel text-text">Job details</h2>
 
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-              <Detail label="Service">
-                {booking.service?.title ?? "—"}
-              </Detail>
+              <Detail label="Service">{booking.service?.title ?? "—"}</Detail>
               <Detail label="Category">
                 {booking.service?.category?.name ?? "—"}
               </Detail>
@@ -179,4 +183,6 @@ export default async function BookingDetailsPage({
       </div>
     </>
   );
-}
+};
+
+export default BookingDetailsPage;

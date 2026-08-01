@@ -4,11 +4,7 @@ import Link from "next/link";
 import { BarChart, MetricBars } from "@/components/design/bar-chart";
 import { EmptyState } from "@/components/shared/empty-state";
 import { Button } from "@/components/ui/button";
-import {
-  busiestHours,
-  jobsByWeek,
-  revenueByService,
-} from "@/lib/analytics";
+import { busiestHours, jobsByWeek, revenueByService } from "@/lib/analytics";
 import { getTechnicianBookings } from "../../../_actions/bookingActions";
 import { PageHeader } from "../../../_components/PageHeader";
 
@@ -24,7 +20,7 @@ export const metadata: Metadata = { title: "Analytics" };
  * only location on the API is the technician's own service area, not the
  * customer's. They're left out rather than filled with a guess.
  */
-export default async function TechnicianAnalyticsPage() {
+const TechnicianAnalyticsPage = async () => {
   const bookings = await getTechnicianBookings();
 
   const weeks = jobsByWeek(bookings, 12);
@@ -49,9 +45,7 @@ export default async function TechnicianAnalyticsPage() {
           description="Analytics are computed from your bookings. Once customers start booking you, this fills in on its own."
           action={
             <Button variant="outline" asChild>
-              <Link href="/dashboard/technician/services">
-                List a service
-              </Link>
+              <Link href="/dashboard/technician/services">List a service</Link>
             </Button>
           }
         />
@@ -101,13 +95,13 @@ export default async function TechnicianAnalyticsPage() {
         </p>
 
         {hours.length === 0 ? (
-          <p className="text-body2 text-text2">
-            No bookings scheduled yet.
-          </p>
+          <p className="text-body2 text-text2">No bookings scheduled yet.</p>
         ) : (
           <MetricBars metrics={hours} />
         )}
       </section>
     </>
   );
-}
+};
+
+export default TechnicianAnalyticsPage;

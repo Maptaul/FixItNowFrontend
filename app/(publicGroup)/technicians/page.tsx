@@ -118,11 +118,11 @@ async function TechnicianResults({
   );
 }
 
-export default async function TechniciansPage({
+const TechniciansPage = async ({
   searchParams,
 }: {
   searchParams: SearchParams;
-}) {
+}) => {
   const categories = await getCategories();
 
   return (
@@ -161,4 +161,6 @@ export default async function TechniciansPage({
       </div>
     </div>
   );
-}
+};
+
+export default TechniciansPage;

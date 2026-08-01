@@ -241,7 +241,9 @@ export function BookingWizard({
         <input type="hidden" name="scheduledAt" value={scheduledAt} />
 
         <div className="rounded-[20px] border border-line bg-surface p-6 shadow-sh2 sm:p-7">
-          <FormAlert message={state?.fieldErrors ? undefined : state?.message} />
+          <FormAlert
+            message={state?.fieldErrors ? undefined : state?.message}
+          />
 
           {/* Step 1 — Service */}
           {step === 1 && (
@@ -308,7 +310,10 @@ export function BookingWizard({
               </div>
 
               {state?.fieldErrors?.serviceId && (
-                <p role="alert" className="mt-3 text-[12px] font-semibold text-red">
+                <p
+                  role="alert"
+                  className="mt-3 text-[12px] font-semibold text-red"
+                >
                   {state.fieldErrors.serviceId}
                 </p>
               )}
@@ -322,8 +327,8 @@ export function BookingWizard({
                 Choose date &amp; time
               </h2>
               <p className="mb-6 text-body text-text2">
-                {technicianName}&apos;s published availability. Booked slots stay
-                visible so you can see how busy they are.
+                {technicianName}&apos;s published availability. Booked slots
+                stay visible so you can see how busy they are.
               </p>
 
               {openDates.size === 0 ? (
@@ -332,8 +337,9 @@ export function BookingWizard({
                     No published slots right now
                   </p>
                   <p className="mx-auto mt-1 max-w-[330px] text-body2 text-text2">
-                    {technicianName} hasn&apos;t opened their calendar yet. Their
-                    profile has a contact route, or try another technician.
+                    {technicianName} hasn&apos;t opened their calendar yet.
+                    Their profile has a contact route, or try another
+                    technician.
                   </p>
                   <Button variant="outline" className="mt-4" asChild>
                     <Link href="/technicians">Browse technicians</Link>
@@ -344,9 +350,7 @@ export function BookingWizard({
                   <MonthGrid
                     openDates={openDates}
                     selected={day}
-                    onSelect={(value) =>
-                      setParams({ day: value, slot: "" })
-                    }
+                    onSelect={(value) => setParams({ day: value, slot: "" })}
                   />
 
                   {day && (
@@ -388,7 +392,10 @@ export function BookingWizard({
               )}
 
               {state?.fieldErrors?.scheduledAt && (
-                <p role="alert" className="mt-3 text-[12px] font-semibold text-red">
+                <p
+                  role="alert"
+                  className="mt-3 text-[12px] font-semibold text-red"
+                >
                   {state.fieldErrors.scheduledAt}
                 </p>
               )}

@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  CheckCheckIcon,
-  CheckIcon,
-  PlayIcon,
-  XIcon,
-} from "lucide-react";
+import { CheckCheckIcon, CheckIcon, PlayIcon, XIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { toast } from "sonner";

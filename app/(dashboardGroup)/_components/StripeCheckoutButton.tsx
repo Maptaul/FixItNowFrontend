@@ -25,11 +25,7 @@ export function StripeCheckoutButton({ bookingId }: { bookingId: string }) {
     <form action={formAction} className="space-y-3">
       <FormAlert message={state?.message} />
 
-      <SubmitButton
-        size="lg"
-        className="w-full"
-        pendingLabel="Opening Stripe…"
-      >
+      <SubmitButton size="lg" className="w-full" pendingLabel="Opening Stripe…">
         <CreditCardIcon />
         Pay with Stripe
       </SubmitButton>

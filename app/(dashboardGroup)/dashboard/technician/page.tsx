@@ -32,7 +32,7 @@ const isToday = (iso: string): boolean => {
   );
 };
 
-export default async function TechnicianDashboardPage() {
+const TechnicianDashboardPage = async () => {
   const [user, bookings] = await Promise.all([
     getMe(),
     getTechnicianBookings(),
@@ -137,7 +137,10 @@ export default async function TechnicianDashboardPage() {
         <section className="rounded-panel border border-line bg-surface p-[22px] shadow-sh2">
           <div className="mb-5 flex items-center justify-between gap-3">
             <h2 className="text-panel text-text">Earnings, last 7 days</h2>
-            <Money value={weekEarnings.total} className="text-[15px] font-bold" />
+            <Money
+              value={weekEarnings.total}
+              className="text-[15px] font-bold"
+            />
           </div>
 
           <BarChart bars={weekEarnings.bars} height={130} />
@@ -157,4 +160,6 @@ export default async function TechnicianDashboardPage() {
       </div>
     </>
   );
-}
+};
+
+export default TechnicianDashboardPage;

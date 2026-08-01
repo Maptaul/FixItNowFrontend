@@ -27,7 +27,7 @@ const greeting = (): string => {
   return "Good evening";
 };
 
-export default async function CustomerDashboardPage() {
+const CustomerDashboardPage = async () => {
   const [user, bookings, payments] = await Promise.all([
     getMe(),
     getMyBookings(),
@@ -44,9 +44,7 @@ export default async function CustomerDashboardPage() {
     (booking) => booking.status === "ACCEPTED",
   );
 
-  const settled = payments.filter(
-    (payment) => payment.status === "COMPLETED",
-  );
+  const settled = payments.filter((payment) => payment.status === "COMPLETED");
 
   // "Spent this year" rather than all-time — the handoff's framing, and the
   // more useful number once an account is a few years old.
@@ -146,4 +144,6 @@ export default async function CustomerDashboardPage() {
       </section>
     </>
   );
-}
+};
+
+export default CustomerDashboardPage;

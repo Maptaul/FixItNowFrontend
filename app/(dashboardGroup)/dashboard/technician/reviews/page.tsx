@@ -22,7 +22,7 @@ export const metadata: Metadata = { title: "My reviews" };
  * resource, so that's left out rather than mocked — a reply box that
  * silently discards what you type is worse than none.
  */
-export default async function TechnicianReviewsPage() {
+const TechnicianReviewsPage = async () => {
   const user = await getMe();
   if (!user) redirect("/auth/login");
 
@@ -34,9 +34,7 @@ export default async function TechnicianReviewsPage() {
   const reviews = publicProfile?.reviews ?? [];
 
   const fiveStar = reviews.filter((review) => review.rating === 5).length;
-  const withComment = reviews.filter((review) =>
-    review.comment?.trim(),
-  ).length;
+  const withComment = reviews.filter((review) => review.comment?.trim()).length;
 
   return (
     <>
@@ -135,4 +133,6 @@ export default async function TechnicianReviewsPage() {
       )}
     </>
   );
-}
+};
+
+export default TechnicianReviewsPage;

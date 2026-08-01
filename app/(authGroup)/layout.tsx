@@ -3,11 +3,7 @@ import { Logo } from "@/components/shared/logo";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
 import { Button } from "@/components/ui/button";
 
-export default function AuthLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+const AuthLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="fx-surface-gradient flex min-h-screen flex-col">
       <header className="flex items-center justify-between px-4 py-4">
@@ -25,4 +21,6 @@ export default function AuthLayout({
       </main>
     </div>
   );
-}
+};
+
+export default AuthLayout;

@@ -13,7 +13,7 @@ import { StatCard } from "../../../_components/StatCard";
 
 export const metadata: Metadata = { title: "Payments" };
 
-export default async function AdminPaymentsPage() {
+const AdminPaymentsPage = async () => {
   const payments = await getMyPayments();
 
   const settled = payments.filter((payment) => payment.status === "COMPLETED");
@@ -74,4 +74,6 @@ export default async function AdminPaymentsPage() {
       </div>
     </>
   );
-}
+};
+
+export default AdminPaymentsPage;

@@ -7,12 +7,11 @@ import { confirmPayment } from "../../_actions/paymentActions";
 
 export const metadata: Metadata = { title: "Payment complete" };
 
-
-export default async function PaymentSuccessPage({
+const PaymentSuccessPage = async ({
   searchParams,
 }: {
   searchParams: Promise<{ session_id?: string }>;
-}) {
+}) => {
   const { session_id: sessionId } = await searchParams;
 
   const result = sessionId
@@ -62,4 +61,6 @@ export default async function PaymentSuccessPage({
       </Card>
     </div>
   );
-}
+};
+
+export default PaymentSuccessPage;

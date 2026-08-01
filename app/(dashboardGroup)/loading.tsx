@@ -1,6 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
-export default function DashboardLoading() {
+const DashboardLoading = () => {
   return (
     <div className="space-y-6">
       <div className="space-y-2">
@@ -17,4 +17,6 @@ export default function DashboardLoading() {
       <Skeleton className="h-80 rounded-xl" />
     </div>
   );
-}
+};
+
+export default DashboardLoading;

@@ -13,7 +13,7 @@ import { ReviewComposer } from "../../../_components/ReviewComposer";
 
 export const metadata: Metadata = { title: "My reviews" };
 
-export default async function CustomerReviewsPage() {
+const CustomerReviewsPage = async () => {
   const bookings = await getMyBookings();
 
   const awaiting = bookings.filter(
@@ -127,4 +127,6 @@ export default async function CustomerReviewsPage() {
       </section>
     </>
   );
-}
+};
+
+export default CustomerReviewsPage;

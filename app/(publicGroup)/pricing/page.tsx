@@ -81,7 +81,7 @@ const FAQ_ITEMS = [
   },
 ];
 
-export default function PricingPage() {
+const PricingPage = () => {
   return (
     <>
       {/* Header */}
@@ -159,9 +159,7 @@ export default function PricingPage() {
       <section className="mx-auto w-full max-w-[1240px] px-5 py-14 lg:px-10 lg:py-16">
         <div className="grid gap-5 lg:grid-cols-2">
           <div className="rounded-panel border border-line bg-surface p-6 shadow-sh2">
-            <h2 className="mb-4 text-panel text-text">
-              What the price covers
-            </h2>
+            <h2 className="mb-4 text-panel text-text">What the price covers</h2>
             <ul className="space-y-2.5">
               {INCLUDED.map((item) => (
                 <li key={item} className="flex gap-2.5 text-body2 text-text2">
@@ -212,8 +210,8 @@ export default function PricingPage() {
             Know what it costs before you book
           </h2>
           <p className="max-w-md text-body text-text2">
-            Filter by trade and budget, and every result shows the total for
-            the visit.
+            Filter by trade and budget, and every result shows the total for the
+            visit.
           </p>
 
           <div className="flex flex-col gap-2.5 sm:flex-row">
@@ -231,4 +229,6 @@ export default function PricingPage() {
       </section>
     </>
   );
-}
+};
+
+export default PricingPage;

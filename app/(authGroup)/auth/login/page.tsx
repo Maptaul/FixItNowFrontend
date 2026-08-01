@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   description: "Log in to your FixItNow account.",
 };
 
-export default function LoginPage() {
+const LoginPage = () => {
   return (
     <Card className="w-full max-w-md">
       <CardHeader>
@@ -33,4 +33,6 @@ export default function LoginPage() {
       </CardContent>
     </Card>
   );
-}
+};
+
+export default LoginPage;

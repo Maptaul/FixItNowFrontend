@@ -6,8 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 
 export const metadata: Metadata = { title: "Payment cancelled" };
 
-
-export default function PaymentCancelPage() {
+const PaymentCancelPage = () => {
   return (
     <div className="mx-auto w-full max-w-lg py-8">
       <Card>
@@ -38,4 +37,6 @@ export default function PaymentCancelPage() {
       </Card>
     </div>
   );
-}
+};
+
+export default PaymentCancelPage;

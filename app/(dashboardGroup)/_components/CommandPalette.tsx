@@ -12,7 +12,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { IRole } from "@/lib/types";
 import { cn } from "@/lib/utils";
-import { dashboardSearch, SearchGroup, SearchHit } from "../_actions/searchActions";
+import {
+  dashboardSearch,
+  SearchGroup,
+  SearchHit,
+} from "../_actions/searchActions";
 
 /**
  * ⌘K search — design handoff § Dashboard shell.
@@ -198,16 +202,13 @@ export function CommandPalette({ role }: { role: IRole }) {
               </p>
             ) : ordered.length === 0 ? (
               <div className="flex flex-col items-center gap-2 px-3 py-8 text-center">
-                <SearchXIcon
-                  aria-hidden="true"
-                  className="size-5 text-text3"
-                />
+                <SearchXIcon aria-hidden="true" className="size-5 text-text3" />
                 <p className="text-body2 font-semibold text-text">
                   Nothing matches &ldquo;{query.trim()}&rdquo;
                 </p>
                 <p className="max-w-xs text-caption text-text2">
-                  Search covers your bookings, plus every service and
-                  technician on the platform.
+                  Search covers your bookings, plus every service and technician
+                  on the platform.
                 </p>
               </div>
             ) : (

@@ -4,12 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BookingStatusBadge } from "@/components/shared/status-badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { canPayBooking } from "@/lib/constants";
 import { formatCurrency, formatDateTime } from "@/lib/format";
@@ -18,11 +13,11 @@ import { StripeCheckoutButton } from "../../../../../_components/StripeCheckoutB
 
 export const metadata: Metadata = { title: "Pay for your booking" };
 
-export default async function PayBookingPage({
+const PayBookingPage = async ({
   params,
 }: {
   params: Promise<{ id: string }>;
-}) {
+}) => {
   const { id } = await params;
   const booking = await getBookingById(id);
 
@@ -103,4 +98,6 @@ export default async function PayBookingPage({
       </Card>
     </div>
   );
-}
+};
+
+export default PayBookingPage;

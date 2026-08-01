@@ -48,16 +48,11 @@ function Metric({ label, value }: { label: string; value: string }) {
   );
 }
 
-export default async function TechnicianProfilePage({
-  params,
-  searchParams,
-}: PageProps) {
+const TechnicianProfilePage = async ({ params, searchParams }: PageProps) => {
   const { id } = await params;
-  const [technician, me, { service: preselectedServiceId }] = await Promise.all([
-    getTechnicianById(id),
-    getMe(),
-    searchParams,
-  ]);
+  const [technician, me, { service: preselectedServiceId }] = await Promise.all(
+    [getTechnicianById(id), getMe(), searchParams],
+  );
 
   if (!technician) notFound();
 
@@ -131,7 +126,9 @@ export default async function TechnicianProfilePage({
                   />
                   <Metric
                     label="Open slots"
-                    value={String(slots.filter((slot) => !slot.isBooked).length)}
+                    value={String(
+                      slots.filter((slot) => !slot.isBooked).length,
+                    )}
                   />
                 </div>
               </div>
@@ -162,7 +159,9 @@ export default async function TechnicianProfilePage({
           {/* Services & fixed prices — divided rows */}
           <section className="overflow-hidden rounded-panel border border-line bg-surface shadow-sh2">
             <div className="border-b border-line px-6 py-4">
-              <h2 className="text-panel text-text">Services &amp; fixed prices</h2>
+              <h2 className="text-panel text-text">
+                Services &amp; fixed prices
+              </h2>
               <p className="mt-0.5 text-caption text-text3">
                 The price you see is the total for the visit.
               </p>
@@ -210,9 +209,7 @@ export default async function TechnicianProfilePage({
 
           {/* Reviews */}
           <section className="space-y-4">
-            <h2 className="text-panel text-text">
-              Reviews ({reviews.length})
-            </h2>
+            <h2 className="text-panel text-text">Reviews ({reviews.length})</h2>
 
             {reviews.length === 0 ? (
               <EmptyState
@@ -274,4 +271,6 @@ export default async function TechnicianProfilePage({
       </div>
     </div>
   );
-}
+};
+
+export default TechnicianProfilePage;

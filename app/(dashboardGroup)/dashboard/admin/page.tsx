@@ -28,7 +28,7 @@ import { StatCard } from "../../_components/StatCard";
 
 export const metadata: Metadata = { title: "Admin dashboard" };
 
-export default async function AdminDashboardPage() {
+const AdminDashboardPage = async () => {
   const [users, bookings, categories, payments] = await Promise.all([
     getAllUsers(),
     getAllBookings(),
@@ -87,8 +87,7 @@ export default async function AdminDashboardPage() {
   const queues = [
     awaitingAccept.length > 0 &&
       `${awaitingAccept.length} booking${awaitingAccept.length === 1 ? "" : "s"} awaiting a technician`,
-    awaitingPayment.length > 0 &&
-      `${awaitingPayment.length} awaiting payment`,
+    awaitingPayment.length > 0 && `${awaitingPayment.length} awaiting payment`,
   ].filter(Boolean) as string[];
 
   return (
@@ -98,7 +97,9 @@ export default async function AdminDashboardPage() {
           <h1 className="text-page text-text">Platform overview</h1>
           <p className="mt-1.5 text-body2 text-text2">
             {today}
-            {queues.length > 0 ? ` · ${queues.join(", ")}.` : " · no open queues."}
+            {queues.length > 0
+              ? ` · ${queues.join(", ")}.`
+              : " · no open queues."}
           </p>
         </div>
 
@@ -130,7 +131,11 @@ export default async function AdminDashboardPage() {
               : undefined
           }
           tone={bookingDelta && bookingDelta.pct >= 0 ? "good" : "bad"}
-          hint={bookingDelta ? undefined : `${awaitingAccept.length} awaiting a technician`}
+          hint={
+            bookingDelta
+              ? undefined
+              : `${awaitingAccept.length} awaiting a technician`
+          }
         />
         <StatCard
           icon={UsersIcon}
@@ -158,7 +163,10 @@ export default async function AdminDashboardPage() {
                 Bookings that got past payment
               </p>
             </div>
-            <Money value={weekRevenue.total} className="text-[15px] font-bold" />
+            <Money
+              value={weekRevenue.total}
+              className="text-[15px] font-bold"
+            />
           </div>
 
           <BarChart bars={weekRevenue.bars} height={180} />
@@ -213,4 +221,6 @@ export default async function AdminDashboardPage() {
       </div>
     </>
   );
-}
+};
+
+export default AdminDashboardPage;

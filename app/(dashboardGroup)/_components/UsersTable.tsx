@@ -37,8 +37,7 @@ const ROLE_CYCLE: (IRole | "ALL")[] = [
 const STATUS_CYCLE: (IActiveStatus | "ALL")[] = ["ALL", "ACTIVE", "BLOCKED"];
 
 /** ALL → "All", TECHNICIAN → "Technician". */
-const label = (value: string) =>
-  value.charAt(0) + value.slice(1).toLowerCase();
+const label = (value: string) => value.charAt(0) + value.slice(1).toLowerCase();
 
 /**
  * Admin user directory — design handoff § Data table, including the
@@ -292,7 +291,9 @@ export function UsersTable({
 
               <DataTableCell className="md:text-right">
                 {isSelf ? (
-                  <span className="text-[12px] text-text3">That&apos;s you</span>
+                  <span className="text-[12px] text-text3">
+                    That&apos;s you
+                  </span>
                 ) : (
                   <Button
                     type="button"

@@ -78,7 +78,7 @@ const FAQ_ITEMS = [
   },
 ];
 
-export default function CustomerSupportPage() {
+const CustomerSupportPage = () => {
   return (
     <>
       <PageHeader
@@ -117,4 +117,6 @@ export default function CustomerSupportPage() {
       </section>
     </>
   );
-}
+};
+
+export default CustomerSupportPage;

@@ -17,7 +17,7 @@ import { TechnicianProfileForm } from "../../../_components/TechnicianProfileFor
 
 export const metadata: Metadata = { title: "My profile" };
 
-export default async function TechnicianProfilePage() {
+const TechnicianProfilePage = async () => {
   const user = await getMe();
   if (!user) redirect("/auth/login");
 
@@ -34,7 +34,9 @@ export default async function TechnicianProfilePage() {
   const reviews = publicProfile?.reviews ?? [];
 
   const trades = [
-    ...new Set(services.map((service) => service.category?.name).filter(Boolean)),
+    ...new Set(
+      services.map((service) => service.category?.name).filter(Boolean),
+    ),
   ] as string[];
 
   return (
@@ -182,4 +184,6 @@ export default async function TechnicianProfilePage() {
       </div>
     </div>
   );
-}
+};
+
+export default TechnicianProfilePage;

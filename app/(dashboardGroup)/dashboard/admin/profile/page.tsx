@@ -7,7 +7,7 @@ import { PageHeader } from "../../../_components/PageHeader";
 
 export const metadata: Metadata = { title: "My profile" };
 
-export default async function AdminProfilePage() {
+const AdminProfilePage = async () => {
   const user = await getMe();
   if (!user) redirect("/auth/login");
 
@@ -28,4 +28,6 @@ export default async function AdminProfilePage() {
       </Card>
     </div>
   );
-}
+};
+
+export default AdminProfilePage;

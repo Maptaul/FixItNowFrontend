@@ -1,7 +1,7 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
 /** Route-level fallback while a page's server work resolves. */
-export default function Loading() {
+const Loading = () => {
   return (
     <div className="mx-auto w-full max-w-6xl space-y-6 px-4 py-10">
       <div className="space-y-2">
@@ -18,4 +18,6 @@ export default function Loading() {
       <Skeleton className="h-72 rounded-xl" />
     </div>
   );
-}
+};
+
+export default Loading;

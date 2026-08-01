@@ -6,7 +6,7 @@ import { ProfileTabs } from "../../../_components/ProfileTabs";
 
 export const metadata: Metadata = { title: "Profile & settings" };
 
-export default async function CustomerProfilePage() {
+const CustomerProfilePage = async () => {
   const user = await getMe();
   if (!user) redirect("/auth/login");
 
@@ -20,4 +20,6 @@ export default async function CustomerProfilePage() {
       <ProfileTabs user={user} />
     </div>
   );
-}
+};
+
+export default CustomerProfilePage;

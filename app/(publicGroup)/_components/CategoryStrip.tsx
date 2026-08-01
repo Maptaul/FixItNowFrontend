@@ -9,7 +9,9 @@ import { getCategories } from "../_actions/getCategories";
  */
 export async function CategoryStrip({ limit = 8 }: { limit?: number }) {
   const categories = await getCategories();
-  const curated = categories.filter((category) => category.icon).slice(0, limit);
+  const curated = categories
+    .filter((category) => category.icon)
+    .slice(0, limit);
 
   if (curated.length === 0) return null;
 

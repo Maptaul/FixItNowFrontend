@@ -95,7 +95,9 @@ function CategoryDialog({
         </DialogHeader>
 
         <form action={formAction} className="space-y-4">
-          <FormAlert message={state?.fieldErrors ? undefined : state?.message} />
+          <FormAlert
+            message={state?.fieldErrors ? undefined : state?.message}
+          />
 
           <Field
             label="Name"
@@ -295,7 +297,9 @@ export function CategoryManager({
                         aria-hidden="true"
                         className="grid size-9 shrink-0 place-items-center rounded-md bg-primary-soft text-[15px] text-primary"
                       >
-                        {category.icon ? category.icon.charAt(0).toUpperCase() : "•"}
+                        {category.icon
+                          ? category.icon.charAt(0).toUpperCase()
+                          : "•"}
                       </span>
                       <span className="min-w-0">
                         <span className="block truncate font-semibold text-text">

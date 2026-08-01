@@ -13,7 +13,7 @@ import { StatCard } from "../../../_components/StatCard";
 
 export const metadata: Metadata = { title: "All bookings" };
 
-export default async function AdminBookingsPage() {
+const AdminBookingsPage = async () => {
   const bookings = await getAllBookings();
 
   const active = bookings.filter((booking) =>
@@ -86,4 +86,6 @@ export default async function AdminBookingsPage() {
       </div>
     </>
   );
-}
+};
+
+export default AdminBookingsPage;

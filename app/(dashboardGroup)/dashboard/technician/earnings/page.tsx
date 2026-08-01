@@ -15,7 +15,7 @@ import { StatCard } from "../../../_components/StatCard";
 
 export const metadata: Metadata = { title: "Earnings" };
 
-export default async function TechnicianEarningsPage() {
+const TechnicianEarningsPage = async () => {
   const bookings = await getTechnicianBookings();
 
   const completed = bookings.filter(
@@ -110,4 +110,6 @@ export default async function TechnicianEarningsPage() {
       </section>
     </>
   );
-}
+};
+
+export default TechnicianEarningsPage;

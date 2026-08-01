@@ -49,7 +49,8 @@ export function ProfileCompletion({
     {
       label: "Experience recorded",
       done: toNumber(profile?.experienceYears) > 0,
-      blocker: "Add your years of experience — it shows on every search result.",
+      blocker:
+        "Add your years of experience — it shows on every search result.",
       href: "#trade-profile",
       cta: "Add experience",
     },

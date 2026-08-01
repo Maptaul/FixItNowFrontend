@@ -5,7 +5,7 @@ import { PageHeader } from "../../../_components/PageHeader";
 
 export const metadata: Metadata = { title: "Availability" };
 
-export default async function TechnicianAvailabilityPage() {
+const TechnicianAvailabilityPage = async () => {
   const slots = await getMyAvailability();
 
   return (
@@ -18,4 +18,6 @@ export default async function TechnicianAvailabilityPage() {
       <AvailabilityScheduler initialSlots={slots} />
     </>
   );
-}
+};
+
+export default TechnicianAvailabilityPage;

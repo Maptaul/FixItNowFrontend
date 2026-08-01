@@ -4,10 +4,7 @@ import { Suspense } from "react";
 import { Mono } from "@/components/design/money";
 import { Button } from "@/components/ui/button";
 import { CardGridSkeleton } from "./_components/CardGridSkeleton";
-import {
-  CategoryGrid,
-  CategoryGridSkeleton,
-} from "./_components/CategoryGrid";
+import { CategoryGrid, CategoryGridSkeleton } from "./_components/CategoryGrid";
 import { FeaturedServices } from "./_components/FeaturedServices";
 import {
   HeroSpotlight,
@@ -50,7 +47,7 @@ const TRUST_LINES = [
   "Track every job to done",
 ];
 
-export default function HomePage() {
+const HomePage = () => {
   return (
     <>
       {/* Hero */}
@@ -253,4 +250,6 @@ export default function HomePage() {
       </section>
     </>
   );
-}
+};
+
+export default HomePage;

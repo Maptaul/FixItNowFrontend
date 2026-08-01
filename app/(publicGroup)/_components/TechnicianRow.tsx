@@ -28,7 +28,9 @@ export function TechnicianRow({
     : toNumber(technician.hourlyRate);
 
   const skills = [
-    ...new Set(services.map((service) => service.category?.name).filter(Boolean)),
+    ...new Set(
+      services.map((service) => service.category?.name).filter(Boolean),
+    ),
   ].slice(0, 4) as string[];
 
   const hasOpenSlot = (technician.slots ?? []).some((slot) => !slot.isBooked);

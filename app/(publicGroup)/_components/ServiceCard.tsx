@@ -72,7 +72,8 @@ export function ServiceCard({ service }: { service: IService }) {
               <span className="font-mono">
                 {formatRating(technician.avgRating)}
               </span>
-              {reviewCount > 0 && ` · ${reviewCount} review${reviewCount === 1 ? "" : "s"}`}
+              {reviewCount > 0 &&
+                ` · ${reviewCount} review${reviewCount === 1 ? "" : "s"}`}
             </span>
           )}
         </div>

@@ -59,13 +59,15 @@ export function ReviewDialog({
         <DialogHeader>
           <DialogTitle>Rate this job</DialogTitle>
           <DialogDescription>
-            How did {booking.technician?.user?.name ?? "your technician"} do with{" "}
-            &ldquo;{booking.service?.title ?? "this job"}&rdquo;?
+            How did {booking.technician?.user?.name ?? "your technician"} do
+            with &ldquo;{booking.service?.title ?? "this job"}&rdquo;?
           </DialogDescription>
         </DialogHeader>
 
         <form action={formAction} className="space-y-4">
-          <FormAlert message={state?.fieldErrors ? undefined : state?.message} />
+          <FormAlert
+            message={state?.fieldErrors ? undefined : state?.message}
+          />
 
           <Field
             label="Rating"

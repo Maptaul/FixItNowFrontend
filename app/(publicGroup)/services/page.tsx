@@ -25,7 +25,11 @@ type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 const first = (value: string | string[] | undefined): string | undefined =>
   Array.isArray(value) ? value[0] : value;
 
-async function ServiceResults({ searchParams }: { searchParams: SearchParams }) {
+async function ServiceResults({
+  searchParams,
+}: {
+  searchParams: SearchParams;
+}) {
   const params = await searchParams;
 
   const { services, meta } = await getServices({
@@ -81,11 +85,11 @@ async function ServiceResults({ searchParams }: { searchParams: SearchParams }) 
   );
 }
 
-export default async function ServicesPage({
+const ServicesPage = async ({
   searchParams,
 }: {
   searchParams: SearchParams;
-}) {
+}) => {
   const categories = await getCategories();
 
   return (
@@ -125,4 +129,6 @@ export default async function ServicesPage({
       </div>
     </div>
   );
-}
+};
+
+export default ServicesPage;

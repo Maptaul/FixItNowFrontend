@@ -22,7 +22,7 @@ import { ServiceFormDialog } from "../../../_components/ServiceFormDialog";
 
 export const metadata: Metadata = { title: "My services" };
 
-export default async function TechnicianServicesPage() {
+const TechnicianServicesPage = async () => {
   const user = await getMe();
   if (!user) redirect("/auth/login");
 
@@ -114,4 +114,6 @@ export default async function TechnicianServicesPage() {
       )}
     </>
   );
-}
+};
+
+export default TechnicianServicesPage;

@@ -13,11 +13,7 @@ import { DashboardBreadcrumb } from "./_components/DashboardBreadcrumb";
 import { DashboardSidebar } from "./_components/DashboardSidebar";
 import { ROLE_LABEL } from "./_config/sidebarMenuItems";
 
-export default async function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+const DashboardLayout = async ({ children }: { children: React.ReactNode }) => {
   const user = await getMe();
 
   if (!user) redirect("/auth/login");
@@ -64,4 +60,6 @@ export default async function DashboardLayout({
       </SidebarProvider>
     </TooltipProvider>
   );
-}
+};
+
+export default DashboardLayout;

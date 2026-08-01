@@ -73,7 +73,10 @@ export function ReviewComposer({ booking }: { booking: IBooking }) {
           </p>
         </div>
 
-        <Money value={booking.totalAmount} className="text-body2 font-semibold" />
+        <Money
+          value={booking.totalAmount}
+          className="text-body2 font-semibold"
+        />
       </div>
 
       <form action={formAction} className="space-y-4">

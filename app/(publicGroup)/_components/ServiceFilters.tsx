@@ -53,9 +53,7 @@ function CheckBox({ checked }: { checked: boolean }) {
 }
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
-  return (
-    <p className="mb-2.5 text-[12.5px] font-bold text-text">{children}</p>
-  );
+  return <p className="mb-2.5 text-[12.5px] font-bold text-text">{children}</p>;
 }
 
 export function ServiceFilters({
@@ -254,7 +252,9 @@ export function ServiceFilters({
           <div className="mb-5 flex justify-between font-mono text-[11.5px] text-text2">
             <span>${minPrice}</span>
             <span>
-              {maxPrice >= PRICE_CEILING ? `$${PRICE_CEILING}+` : `$${maxPrice}`}
+              {maxPrice >= PRICE_CEILING
+                ? `$${PRICE_CEILING}+`
+                : `$${maxPrice}`}
             </span>
           </div>
         </>

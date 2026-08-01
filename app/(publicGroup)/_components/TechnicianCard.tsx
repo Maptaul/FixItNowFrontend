@@ -22,7 +22,9 @@ export function TechnicianCard({
     : toNumber(technician.hourlyRate);
 
   const categories = [
-    ...new Set(services.map((service) => service.category?.name).filter(Boolean)),
+    ...new Set(
+      services.map((service) => service.category?.name).filter(Boolean),
+    ),
   ].slice(0, 3) as string[];
 
   return (

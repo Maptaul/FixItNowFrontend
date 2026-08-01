@@ -92,7 +92,9 @@ export function ServiceFormDialog({
         </DialogHeader>
 
         <form action={formAction} className="space-y-4">
-          <FormAlert message={state?.fieldErrors ? undefined : state?.message} />
+          <FormAlert
+            message={state?.fieldErrors ? undefined : state?.message}
+          />
 
           <Field
             label="Title"

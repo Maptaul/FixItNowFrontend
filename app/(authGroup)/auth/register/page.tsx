@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     "Join FixItNow as a customer to book home services, or as a technician to sell them.",
 };
 
-export default function RegisterPage() {
+const RegisterPage = () => {
   return (
     <Card className="w-full max-w-md">
       <CardHeader>
@@ -33,4 +33,6 @@ export default function RegisterPage() {
       </CardContent>
     </Card>
   );
-}
+};
+
+export default RegisterPage;

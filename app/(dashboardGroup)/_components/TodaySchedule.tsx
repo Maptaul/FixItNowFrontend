@@ -37,18 +37,14 @@ const isToday = (iso: string): boolean => {
 export function TodaySchedule({ bookings }: { bookings: IBooking[] }) {
   const today = bookings
     .filter((booking) => isToday(booking.scheduledAt))
-    .filter(
-      (booking) => !["CANCELLED", "DECLINED"].includes(booking.status),
-    )
+    .filter((booking) => !["CANCELLED", "DECLINED"].includes(booking.status))
     .sort(
       (a, b) =>
         new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime(),
     );
 
   // The next job that hasn't finished — the one worth highlighting.
-  const nextId = today.find(
-    (booking) => booking.status !== "COMPLETED",
-  )?.id;
+  const nextId = today.find((booking) => booking.status !== "COMPLETED")?.id;
 
   return (
     <section className="rounded-panel border border-line bg-surface p-[22px] shadow-sh2">

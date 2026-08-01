@@ -18,9 +18,7 @@ import { TechnicianBookingActions } from "./TechnicianBookingActions";
  * actually holds rather than inventing the rest.
  */
 export function IncomingRequests({ bookings }: { bookings: IBooking[] }) {
-  const requests = bookings.filter(
-    (booking) => booking.status === "REQUESTED",
-  );
+  const requests = bookings.filter((booking) => booking.status === "REQUESTED");
 
   return (
     <section className="rounded-panel border border-line bg-surface p-[22px] shadow-sh2">
@@ -44,10 +42,7 @@ export function IncomingRequests({ bookings }: { bookings: IBooking[] }) {
       ) : (
         <ul className="flex flex-col gap-3">
           {requests.map((booking) => (
-            <li
-              key={booking.id}
-              className="rounded-row border border-line p-4"
-            >
+            <li key={booking.id} className="rounded-row border border-line p-4">
               <div className="mb-2.5 flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <p className="text-[14.5px] font-bold text-text">
