@@ -1,140 +1,216 @@
 import {
+  BanknoteIcon,
   CalendarRangeIcon,
-  ShapesIcon,
-  TrendingUpIcon,
-  UserCheckIcon,
+  CircleSlashIcon,
   UsersIcon,
-  WrenchIcon,
 } from "lucide-react";
 import { Metadata } from "next";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { BarChart } from "@/components/design/bar-chart";
+import { BarChart, MetricBars } from "@/components/design/bar-chart";
 import { Money } from "@/components/design/money";
-import { bookingsByStatus, earningsByDay } from "@/lib/analytics";
+import { Button } from "@/components/ui/button";
+import {
+  earningsByDay,
+  periodDelta,
+  recentActivity,
+  statusSplit,
+} from "@/lib/analytics";
 import { formatCurrency, toNumber } from "@/lib/format";
-import { getAdminCategories, getAllBookings, getAllUsers } from "../../_actions/adminActions";
+import {
+  getAdminCategories,
+  getAllBookings,
+  getAllUsers,
+} from "../../_actions/adminActions";
+import { getMyPayments } from "../../_actions/paymentActions";
+import { ActivityFeed } from "../../_components/ActivityFeed";
 import { BookingsTable } from "../../_components/BookingsTable";
-import { PageHeader } from "../../_components/PageHeader";
 import { StatCard } from "../../_components/StatCard";
 
 export const metadata: Metadata = { title: "Admin dashboard" };
 
 export default async function AdminDashboardPage() {
-  const [users, bookings, categories] = await Promise.all([
+  const [users, bookings, categories, payments] = await Promise.all([
     getAllUsers(),
     getAllBookings(),
     getAdminCategories(),
+    getMyPayments(),
   ]);
 
   const technicians = users.filter((user) => user.role === "TECHNICIAN");
-  const banned = users.filter((user) => user.activeStatus === "BLOCKED");
 
-  const activeBookings = bookings.filter((booking) =>
-    ["REQUESTED", "ACCEPTED", "PAID", "IN_PROGRESS"].includes(booking.status),
+  const awaitingAccept = bookings.filter(
+    (booking) => booking.status === "REQUESTED",
+  );
+  const awaitingPayment = bookings.filter(
+    (booking) => booking.status === "ACCEPTED",
   );
 
-  // Revenue = money actually collected, i.e. bookings that got past payment.
+  const lost = bookings.filter((booking) =>
+    ["CANCELLED", "DECLINED"].includes(booking.status),
+  );
+
+  // Revenue = money the platform can prove it collected.
   const revenue = bookings
     .filter((booking) =>
       ["PAID", "IN_PROGRESS", "COMPLETED"].includes(booking.status),
     )
     .reduce((sum, booking) => sum + toNumber(booking.totalAmount), 0);
 
-  const statusBars = bookingsByStatus(bookings);
+  const bookingDelta = periodDelta(bookings, 30);
+  const revenueDelta = periodDelta(bookings, 30, (booking) =>
+    ["PAID", "IN_PROGRESS", "COMPLETED"].includes(booking.status)
+      ? toNumber(booking.totalAmount)
+      : 0,
+  );
+
+  const cancelRate =
+    bookings.length === 0
+      ? 0
+      : Math.round((lost.length / bookings.length) * 1000) / 10;
+
+  const split = statusSplit(bookings);
   const weekRevenue = earningsByDay(bookings, 7, [
     "PAID",
     "IN_PROGRESS",
     "COMPLETED",
   ]);
+  const activity = recentActivity(bookings, payments, users, 8);
+
+  // The handoff's date line names the queues that are actually open.
+  const today = new Date().toLocaleDateString("en-US", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+
+  const queues = [
+    awaitingAccept.length > 0 &&
+      `${awaitingAccept.length} booking${awaitingAccept.length === 1 ? "" : "s"} awaiting a technician`,
+    awaitingPayment.length > 0 &&
+      `${awaitingPayment.length} awaiting payment`,
+  ].filter(Boolean) as string[];
 
   return (
     <>
-      <PageHeader
-        title="Platform overview"
-        description="Users, bookings and revenue across the whole marketplace."
-        action={
-          <Button variant="outline" asChild>
-            <Link href="/dashboard/admin/users">Manage users</Link>
-          </Button>
-        }
-      />
+      <header className="mb-6 flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="text-page text-text">Platform overview</h1>
+          <p className="mt-1.5 text-body2 text-text2">
+            {today}
+            {queues.length > 0 ? ` · ${queues.join(", ")}.` : " · no open queues."}
+          </p>
+        </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <Button variant="outline" asChild>
+          <Link href="/dashboard/admin/bookings">View all bookings</Link>
+        </Button>
+      </header>
+
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
-          icon={UsersIcon}
-          label="Total users"
-          value={users.length}
-          hint={banned.length > 0 ? `${banned.length} banned` : "None banned"}
-        />
-        <StatCard
-          icon={WrenchIcon}
-          label="Technicians"
-          value={technicians.length}
-        />
-        <StatCard
-          icon={UserCheckIcon}
-          label="Customers"
-          value={users.filter((user) => user.role === "CUSTOMER").length}
+          icon={BanknoteIcon}
+          label="Revenue collected"
+          value={formatCurrency(revenue)}
+          delta={
+            revenueDelta
+              ? `${revenueDelta.pct >= 0 ? "▲" : "▼"} ${Math.abs(revenueDelta.pct)}% vs previous 30 days`
+              : undefined
+          }
+          tone={revenueDelta && revenueDelta.pct >= 0 ? "good" : "bad"}
+          hint={revenueDelta ? undefined : "Paid and beyond"}
         />
         <StatCard
           icon={CalendarRangeIcon}
-          label="Total bookings"
+          label="Bookings"
           value={bookings.length}
-          hint={`${activeBookings.length} active`}
+          delta={
+            bookingDelta
+              ? `${bookingDelta.pct >= 0 ? "▲" : "▼"} ${Math.abs(bookingDelta.pct)}% vs previous 30 days`
+              : undefined
+          }
+          tone={bookingDelta && bookingDelta.pct >= 0 ? "good" : "bad"}
+          hint={bookingDelta ? undefined : `${awaitingAccept.length} awaiting a technician`}
         />
         <StatCard
-          icon={TrendingUpIcon}
-          label="Revenue"
-          value={formatCurrency(revenue)}
-          hint="Paid and beyond"
+          icon={UsersIcon}
+          label="Active technicians"
+          value={technicians.length}
+          hint={`${users.length} users · ${categories.length} categories`}
         />
         <StatCard
-          icon={ShapesIcon}
-          label="Categories"
-          value={categories.length}
+          icon={CircleSlashIcon}
+          label="Cancellation rate"
+          value={`${cancelRate}%`}
+          delta={`${lost.length} cancelled or declined`}
+          // A high cancellation share is a regression, so it reads red.
+          tone={cancelRate > 20 ? "bad" : "neutral"}
         />
       </div>
 
-      {/* Volume + revenue — the handoff's 1.6fr / 1fr split. */}
+      {/* Revenue + status split — the handoff's 1.6fr / 1fr split. */}
       <div className="mt-6 grid gap-5 lg:grid-cols-[1.6fr_1fr]">
-        <section className="rounded-panel border border-line bg-surface p-[22px] shadow-sh2">
-          <div className="mb-5 flex items-center justify-between gap-3">
-            <h2 className="text-panel text-text">Bookings by status</h2>
-            <span className="font-mono text-[15px] font-bold text-text">
-              {bookings.length}
-            </span>
-          </div>
-
-          <BarChart bars={statusBars} height={160} />
-        </section>
-
-        <section className="rounded-panel border border-line bg-surface p-[22px] shadow-sh2">
-          <div className="mb-5 flex items-center justify-between gap-3">
-            <h2 className="text-panel text-text">Revenue, last 7 days</h2>
+        <section className="rounded-panel border border-line bg-surface p-6 shadow-sh2">
+          <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 className="text-panel text-text">Revenue, last 7 days</h2>
+              <p className="mt-0.5 text-caption text-text3">
+                Bookings that got past payment
+              </p>
+            </div>
             <Money value={weekRevenue.total} className="text-[15px] font-bold" />
           </div>
 
-          <BarChart bars={weekRevenue.bars} height={160} />
+          <BarChart bars={weekRevenue.bars} height={180} />
+        </section>
+
+        <section className="rounded-panel border border-line bg-surface p-6 shadow-sh2">
+          <h2 className="mb-5 text-panel text-text">Bookings by status</h2>
+
+          <MetricBars metrics={split} />
+
+          {/*
+           * Diagnostic callout. The handoff names a cause ("Uttara evening
+           * slots"); nothing in this API records why a booking failed, so
+           * this states what the numbers do support and stops there.
+           */}
+          {lost.length > 0 && (
+            <p className="mt-5 rounded-lg border border-amber-border bg-amber-soft p-3 text-[12.5px] leading-[1.55] text-text2">
+              <span className="font-bold text-amber">
+                {cancelRate}% of bookings ended early.{" "}
+              </span>
+              {awaitingAccept.length > 0
+                ? `${awaitingAccept.length} more are still waiting on a technician — unanswered requests are the usual cause.`
+                : "Every request has been answered, so these ended after acceptance."}
+            </p>
+          )}
         </section>
       </div>
 
-      <section className="mt-8">
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-panel text-text">Latest bookings</h2>
-          <Button variant="outline" size="sm" asChild>
-            <Link href="/dashboard/admin/bookings">View all</Link>
-          </Button>
-        </div>
+      {/* Latest bookings + activity — the handoff's 1.3fr / 1fr split. */}
+      <div className="mt-6 grid gap-5 lg:grid-cols-[1.3fr_1fr]">
+        <section className="min-w-0">
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="text-panel text-text">Latest bookings</h2>
+            <Link
+              href="/dashboard/admin/bookings"
+              className="text-btn text-primary hover:text-primary-hover"
+            >
+              View all →
+            </Link>
+          </div>
 
-        <BookingsTable
-          showTabs={false}
-          bookings={bookings.slice(0, 8)}
-          variant="admin"
-          emptyTitle="No bookings on the platform yet"
-          emptyDescription="Once customers start booking technicians, they'll show up here."
-        />
-      </section>
+          <BookingsTable
+            showTabs={false}
+            bookings={bookings.slice(0, 6)}
+            variant="admin"
+            emptyTitle="No bookings on the platform yet"
+            emptyDescription="Once customers start booking technicians, they'll show up here."
+          />
+        </section>
+
+        <ActivityFeed items={activity} />
+      </div>
     </>
   );
 }
