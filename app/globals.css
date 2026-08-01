@@ -433,6 +433,68 @@
   }
 
   /*
+   * Dual-handle price slider — design handoff § Search results.
+   *
+   * Two native <input type="range"> stack over a shared track drawn by divs
+   * behind them. The input itself is transparent and ignores pointer events;
+   * only the thumb takes them, so both handles stay grabbable even where the
+   * two inputs overlap. Keyboard and screen-reader support come from the
+   * native control.
+   *
+   * Thumb: 16px circle, --surface fill, 2px --primary border, --sh1.
+   */
+  .fx-range {
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+    pointer-events: none;
+  }
+
+  .fx-range:focus {
+    outline: none;
+  }
+
+  .fx-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    pointer-events: auto;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 2px solid var(--primary);
+    box-shadow: var(--sh1);
+    cursor: grab;
+  }
+
+  .fx-range::-webkit-slider-thumb:active {
+    cursor: grabbing;
+  }
+
+  .fx-range:focus-visible::-webkit-slider-thumb {
+    box-shadow: var(--ring-shadow);
+  }
+
+  .fx-range::-moz-range-thumb {
+    pointer-events: auto;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 2px solid var(--primary);
+    box-shadow: var(--sh1);
+    cursor: grab;
+  }
+
+  .fx-range:focus-visible::-moz-range-thumb {
+    box-shadow: var(--ring-shadow);
+  }
+
+  .fx-range::-moz-range-track {
+    background: transparent;
+  }
+
+  /*
    * Image placeholder. Every image in the handoff is an intentional 45°
    * striped band with a mono caption naming what belongs there.
    */
