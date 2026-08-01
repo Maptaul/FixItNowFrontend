@@ -1,9 +1,12 @@
 import {
+  BanknoteIcon,
   CalendarClockIcon,
   CalendarRangeIcon,
+  ChartNoAxesColumnIcon,
   ClipboardListIcon,
   CreditCardIcon,
   LayoutDashboardIcon,
+  LifeBuoyIcon,
   ShapesIcon,
   StarIcon,
   UserIcon,
@@ -33,6 +36,11 @@ const customerSidebarItems: ISidebarItem[] = [
   },
   { label: "Reviews", href: "/dashboard/customer/reviews", icon: StarIcon },
   { label: "My profile", href: "/dashboard/customer/profile", icon: UserIcon },
+  {
+    label: "Help centre",
+    href: "/dashboard/customer/support",
+    icon: LifeBuoyIcon,
+  },
 ];
 
 const technicianSidebarItems: ISidebarItem[] = [
@@ -62,6 +70,16 @@ const technicianSidebarItems: ISidebarItem[] = [
     icon: WalletIcon,
   },
   {
+    label: "Analytics",
+    href: "/dashboard/technician/analytics",
+    icon: ChartNoAxesColumnIcon,
+  },
+  {
+    label: "Reviews",
+    href: "/dashboard/technician/reviews",
+    icon: StarIcon,
+  },
+  {
     label: "My profile",
     href: "/dashboard/technician/profile",
     icon: UserIcon,
@@ -75,6 +93,11 @@ const adminSidebarItems: ISidebarItem[] = [
     label: "Bookings",
     href: "/dashboard/admin/bookings",
     icon: CalendarRangeIcon,
+  },
+  {
+    label: "Payments",
+    href: "/dashboard/admin/payments",
+    icon: BanknoteIcon,
   },
   {
     label: "Categories",
