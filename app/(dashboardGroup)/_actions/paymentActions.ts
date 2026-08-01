@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { apiFetch } from "@/lib/api";
+import { apiFetch, getAppOrigin } from "@/lib/api";
 import { ICheckoutSession, IConfirmPaymentResult, IFormState, IPayment } from "@/lib/types";
 
 /** Payment history for the signed-in customer (all payments for an admin). */
@@ -21,9 +21,14 @@ export const getMyPayments = async (): Promise<IPayment[]> => {
 export const startCheckout = async (
   bookingId: string,
 ): Promise<IFormState> => {
+  // Tell the API which frontend to send the customer back to. It only
+  // honours origins on its own allow-list (APP_ORIGINS), so this can't be
+  // used to redirect a payer anywhere else.
+  const origin = await getAppOrigin();
+
   const result = await apiFetch<ICheckoutSession>("/api/payments/create", {
     method: "POST",
-    body: { bookingId },
+    body: { bookingId, origin },
   });
 
   if (!result.success) {

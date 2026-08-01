@@ -1,4 +1,4 @@
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { IApiResponse } from "./types";
 
 /**
@@ -30,6 +30,31 @@ type ApiFetchOptions = Omit<RequestInit, "body"> & {
 export const getAccessToken = async (): Promise<string | undefined> => {
   const cookieStore = await cookies();
   return cookieStore.get("accessToken")?.value;
+};
+
+/**
+ * The public origin this request arrived on — e.g. `http://localhost:3000`
+ * or `https://fixit-now-frontend.vercel.app`.
+ *
+ * Stripe needs an absolute URL to return the customer to after checkout, and
+ * the API can't guess which frontend started it: local development and the
+ * deployed site are different hosts. Reading it from the live request means
+ * it's right on both, and on preview deployments, with nothing to configure.
+ *
+ * `NEXT_PUBLIC_APP_URL` overrides it when the app sits behind a proxy that
+ * rewrites Host.
+ */
+export const getAppOrigin = async (): Promise<string> => {
+  const configured = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/+$/, "");
+  if (configured) return configured;
+
+  const headerList = await headers();
+  const host = headerList.get("host") ?? "localhost:3000";
+  const proto =
+    headerList.get("x-forwarded-proto") ??
+    (host.startsWith("localhost") ? "http" : "https");
+
+  return `${proto}://${host}`;
 };
 
 export async function apiFetch<T>(
