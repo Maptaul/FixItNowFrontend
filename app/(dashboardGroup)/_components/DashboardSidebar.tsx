@@ -1,42 +1,62 @@
 "use client";
 
-import { HomeIcon, LogOutIcon } from "lucide-react";
+import { HomeIcon, LogOutIcon, PanelLeftIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Logo } from "@/components/shared/logo";
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { IUser } from "@/lib/types";
 import { logout } from "@/service/logout";
 import { ROLE_LABEL, SIDEBAR_ITEMS } from "../_config/sidebarMenuItems";
 
+/**
+ * Dashboard sidebar — design handoff § Dashboard shell.
+ *
+ * 248px expanded / 68px icon rail, sticky full height, 1px right border on
+ * --surface. The brand block carries a 32px r10 primary tile plus the role
+ * label; nav items are 9px/11px at r10 with an 18px centred icon slot. When
+ * collapsed only the icon renders, and each item keeps its label as a
+ * tooltip. Width transitions over 180ms.
+ */
 export function DashboardSidebar({ user }: { user: IUser }) {
   const pathname = usePathname();
+  const { state, toggleSidebar } = useSidebar();
+
   const items = SIDEBAR_ITEMS[user.role];
+  const isCollapsed = state === "collapsed";
 
   return (
-    <Sidebar collapsible="offcanvas">
-      <SidebarHeader className="border-b">
-        <div className="px-2 py-1.5">
-          <Logo />
-        </div>
+    <Sidebar collapsible="icon" className="border-line">
+      <SidebarHeader className="border-b border-line px-3 py-4">
+        <Link href="/" className="flex items-center gap-2.5 overflow-hidden">
+          <span className="grid size-8 shrink-0 place-items-center rounded-md bg-primary text-[15px] font-extrabold text-primary-foreground">
+            F
+          </span>
+          <span className="min-w-0 group-data-[collapsible=icon]:hidden">
+            <span className="block truncate text-[15px] font-extrabold tracking-[-0.03em] text-text">
+              FixItNow
+            </span>
+            <span className="block truncate text-[11.5px] font-medium text-text3">
+              {ROLE_LABEL[user.role]}
+            </span>
+          </span>
+        </Link>
       </SidebarHeader>
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>{ROLE_LABEL[user.role]}</SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu className="gap-1">
               {items.map((item) => {
                 // Only the overview link is an exact match; the rest are
                 // prefixes so nested pages keep their parent highlighted.
@@ -47,9 +67,14 @@ export function DashboardSidebar({ user }: { user: IUser }) {
 
                 return (
                   <SidebarMenuItem key={item.href}>
-                    <SidebarMenuButton asChild isActive={isActive}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={isActive}
+                      tooltip={item.label}
+                      className="h-auto gap-3 rounded-md px-[11px] py-[9px] text-body2 font-semibold data-[active=true]:bg-primary-soft data-[active=true]:text-primary"
+                    >
                       <Link href={item.href}>
-                        <item.icon />
+                        <item.icon className="size-[18px]" />
                         <span>{item.label}</span>
                       </Link>
                     </SidebarMenuButton>
@@ -61,21 +86,41 @@ export function DashboardSidebar({ user }: { user: IUser }) {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="border-t">
-        <SidebarMenu>
+      <SidebarFooter className="border-t border-line">
+        <SidebarMenu className="gap-1">
           <SidebarMenuItem>
-            <SidebarMenuButton asChild>
+            <SidebarMenuButton
+              asChild
+              tooltip="Back to site"
+              className="h-auto gap-3 rounded-md px-[11px] py-[9px] text-body2 font-semibold"
+            >
               <Link href="/">
-                <HomeIcon />
+                <HomeIcon className="size-[18px]" />
                 <span>Back to site</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
 
           <SidebarMenuItem>
-            <SidebarMenuButton onClick={() => logout()}>
-              <LogOutIcon />
+            <SidebarMenuButton
+              onClick={() => logout()}
+              tooltip="Log out"
+              className="h-auto gap-3 rounded-md px-[11px] py-[9px] text-body2 font-semibold text-text2 hover:text-red"
+            >
+              <LogOutIcon className="size-[18px]" />
               <span>Log out</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+
+          {/* Collapse control sits above the border, per the handoff. */}
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              onClick={toggleSidebar}
+              tooltip="Expand sidebar"
+              className="h-auto gap-3 rounded-md px-[11px] py-[9px] text-body2 font-semibold text-text3"
+            >
+              <PanelLeftIcon className="size-[18px]" />
+              <span>{isCollapsed ? "Expand" : "Collapse"}</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
