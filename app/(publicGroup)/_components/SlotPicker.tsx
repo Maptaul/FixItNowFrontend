@@ -73,7 +73,8 @@ export function SlotPicker({
                 {formatDate(date)}
               </p>
 
-              <div className="flex flex-wrap gap-1.5">
+              {/* Slot grid — 2 columns here (the rail is 380px), 8px gap. */}
+              <div className="grid grid-cols-2 gap-2">
                 {daySlots.map((slot) => {
                   const isSelected = slot.id === selectedSlotId;
 
@@ -89,19 +90,21 @@ export function SlotPicker({
                         setCustomTime("");
                       }}
                       className={cn(
-                        "inline-flex items-center gap-1 rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-colors",
+                        "inline-flex items-center justify-center gap-1 rounded-md border px-2 py-2 text-[12px] font-semibold transition-colors duration-120",
+                        // Taken slots stay visible so the customer can see how
+                        // busy the technician is.
                         slot.isBooked &&
-                          "cursor-not-allowed bg-muted text-muted-foreground line-through opacity-60",
+                          "cursor-not-allowed border-line bg-surface2 text-text3 line-through",
                         !slot.isBooked &&
                           !isSelected &&
-                          "hover:border-primary hover:bg-primary/10",
+                          "border-line-strong bg-surface text-text hover:border-primary hover:bg-primary-soft",
                         isSelected &&
-                          "border-primary bg-primary text-primary-foreground",
+                          "border-primary bg-primary-soft text-primary",
                       )}
                       title={slot.isBooked ? "Already booked" : "Available"}
                     >
                       {isSelected && <CheckIcon className="size-3" />}
-                      {formatTime(slot.startTime)} – {formatTime(slot.endTime)}
+                      {formatTime(slot.startTime)}
                     </button>
                   );
                 })}

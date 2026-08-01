@@ -1,18 +1,13 @@
-import {
-  BriefcaseIcon,
-  MapPinIcon,
-  MessageSquareIcon,
-  ShieldCheckIcon,
-} from "lucide-react";
+import { MessageSquareIcon } from "lucide-react";
 import { Metadata } from "next";
-import Image from "next/image";
+import Link from "next/link";
 import { notFound } from "next/navigation";
+import { GradientAvatar } from "@/components/design/gradient-avatar";
+import { Money } from "@/components/design/money";
+import { RatingHistogram } from "@/components/design/rating-histogram";
 import { EmptyState } from "@/components/shared/empty-state";
-import { Rating } from "@/components/shared/rating";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { avatarUrl, formatCurrency, formatDate } from "@/lib/format";
+import { formatDate, formatRating, toNumber } from "@/lib/format";
 import { getMe } from "@/service/getMe";
 import { getTechnicianById } from "../../_actions/getTechnicians";
 import { BookingPanel } from "../../_components/BookingPanel";
@@ -35,8 +30,22 @@ export async function generateMetadata({
     title: name,
     description:
       technician.bio ??
-      `Book ${name} on FixItNow — see their services, rating and availability.`,
+      `Book ${name} on FixItNow — fixed prices, real reviews, slots you can see.`,
   };
+}
+
+/** The 4-metric row under the identity block. */
+function Metric({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="min-w-0">
+      <p className="font-mono text-[19px] font-bold tracking-[-0.02em] text-text">
+        {value}
+      </p>
+      <p className="mt-0.5 truncate text-[11.5px] font-medium text-text3">
+        {label}
+      </p>
+    </div>
+  );
 }
 
 export default async function TechnicianProfilePage({
@@ -57,105 +66,151 @@ export default async function TechnicianProfilePage({
   const reviews = technician.reviews ?? [];
   const slots = technician.slots ?? [];
 
+  const fromPrice = services.length
+    ? Math.min(...services.map((service) => toNumber(service.price)))
+    : toNumber(technician.hourlyRate);
+
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 py-10">
-      <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
-        {/* Profile */}
-        <div className="space-y-8">
-          <header className="flex flex-col gap-4 sm:flex-row sm:items-start">
-            <Image
-              src={avatarUrl(name)}
-              alt=""
-              width={96}
-              height={96}
-              priority
-              className="size-24 shrink-0 rounded-2xl bg-muted object-cover"
-            />
+    <div className="mx-auto w-full max-w-[1240px] px-5 py-10 lg:px-10">
+      <nav aria-label="Breadcrumb" className="mb-5">
+        <ol className="flex flex-wrap items-center gap-1.5 text-caption text-text3">
+          <li>
+            <Link href="/" className="hover:text-text2">
+              Home
+            </Link>
+          </li>
+          <li aria-hidden="true">/</li>
+          <li>
+            <Link href="/technicians" className="hover:text-text2">
+              Technicians
+            </Link>
+          </li>
+          <li aria-hidden="true">/</li>
+          <li className="text-text2">{name}</li>
+        </ol>
+      </nav>
 
-            <div className="space-y-2">
-              <div className="flex flex-wrap items-center gap-2">
-                <h1 className="text-3xl font-bold tracking-tight">{name}</h1>
-                {technician.isVerified && (
-                  <Badge variant="secondary" className="gap-1">
-                    <ShieldCheckIcon className="size-3.5" />
-                    Verified
-                  </Badge>
-                )}
-              </div>
+      <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
+        {/* Left column */}
+        <div className="min-w-0 space-y-6">
+          {/* Profile card */}
+          <section className="rounded-panel border border-line bg-surface p-6 shadow-sh2">
+            <div className="flex flex-col gap-5 sm:flex-row">
+              <GradientAvatar
+                name={name}
+                kind="technician"
+                size={96}
+                radius={22}
+              />
 
-              <Rating value={technician.avgRating} count={reviews.length} />
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h1 className="text-page text-text">{name}</h1>
+                  {technician.isVerified && (
+                    <Badge variant="emerald">Verified</Badge>
+                  )}
+                </div>
 
-              <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground">
-                {technician.location && (
-                  <span className="flex items-center gap-1">
-                    <MapPinIcon className="size-3.5" />
-                    {technician.location}
-                  </span>
-                )}
-                <span className="flex items-center gap-1">
-                  <BriefcaseIcon className="size-3.5" />
+                <p className="mt-1.5 text-body2 text-text2">
+                  {services[0]?.category?.name ?? "Home services"}
+                  {technician.location ? ` · ${technician.location}` : ""}
+                  {" · "}
                   {technician.experienceYears} yr
                   {technician.experienceYears === 1 ? "" : "s"} experience
-                </span>
-                <span>
-                  {formatCurrency(technician.hourlyRate)}
-                  <span className="text-muted-foreground">/hr</span>
-                </span>
+                </p>
+
+                <div className="mt-5 grid grid-cols-2 gap-4 border-t border-line pt-4 sm:grid-cols-4">
+                  <Metric
+                    label="Average rating"
+                    value={formatRating(technician.avgRating)}
+                  />
+                  <Metric label="Reviews" value={String(reviews.length)} />
+                  <Metric
+                    label="Services listed"
+                    value={String(services.length)}
+                  />
+                  <Metric
+                    label="Open slots"
+                    value={String(slots.filter((slot) => !slot.isBooked).length)}
+                  />
+                </div>
               </div>
             </div>
-          </header>
 
-          <Separator />
-
-          <section className="space-y-2">
-            <h2 className="text-lg font-semibold">About</h2>
-            <p className="text-pretty text-muted-foreground">
+            <p className="mt-5 text-[14.5px] leading-[1.7] text-text2">
               {technician.bio ??
-                "This technician hasn't written a bio yet. Their services and reviews are below."}
+                "This technician hasn't written a bio yet. Their services, prices and reviews are below."}
             </p>
-          </section>
 
-          <section className="space-y-3">
-            <h2 className="text-lg font-semibold">
-              Services ({services.length})
-            </h2>
-
-            {services.length === 0 ? (
-              <p className="text-sm text-muted-foreground">
-                No services listed yet.
-              </p>
-            ) : (
-              <div className="grid gap-3 sm:grid-cols-2">
-                {services.map((service) => (
-                  <Card key={service.id}>
-                    <CardContent className="space-y-1.5">
-                      <div className="flex items-start justify-between gap-3">
-                        <h3 className="font-medium">{service.title}</h3>
-                        <span className="shrink-0 font-semibold">
-                          {formatCurrency(service.price)}
-                        </span>
-                      </div>
-
-                      {service.category && (
-                        <Badge variant="secondary">
-                          {service.category.name}
-                        </Badge>
-                      )}
-
-                      {service.description && (
-                        <p className="text-sm text-muted-foreground">
-                          {service.description}
-                        </p>
-                      )}
-                    </CardContent>
-                  </Card>
+            {services.length > 0 && (
+              <div className="mt-4 flex flex-wrap gap-1.5">
+                {[
+                  ...new Set(
+                    services
+                      .map((service) => service.category?.name)
+                      .filter(Boolean),
+                  ),
+                ].map((skill) => (
+                  <Badge key={skill as string} variant="neutral">
+                    {skill as string}
+                  </Badge>
                 ))}
               </div>
             )}
           </section>
 
-          <section className="space-y-3">
-            <h2 className="text-lg font-semibold">
+          {/* Services & fixed prices — divided rows */}
+          <section className="overflow-hidden rounded-panel border border-line bg-surface shadow-sh2">
+            <div className="border-b border-line px-6 py-4">
+              <h2 className="text-panel text-text">Services &amp; fixed prices</h2>
+              <p className="mt-0.5 text-caption text-text3">
+                The price you see is the total for the visit.
+              </p>
+            </div>
+
+            {services.length === 0 ? (
+              <p className="px-6 py-8 text-center text-body2 text-text2">
+                This technician hasn&apos;t listed any services yet.
+              </p>
+            ) : (
+              <ul>
+                {services.map((service) => (
+                  <li
+                    key={service.id}
+                    className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-6 py-4 last:border-b-0"
+                  >
+                    <div className="min-w-0">
+                      <p className="text-cardtitle text-text">
+                        {service.title}
+                      </p>
+                      {service.description && (
+                        <p className="mt-0.5 line-clamp-1 text-caption font-normal text-text2">
+                          {service.description}
+                        </p>
+                      )}
+                      {service.category && (
+                        <Badge variant="neutral" className="mt-1.5">
+                          {service.category.name}
+                        </Badge>
+                      )}
+                    </div>
+
+                    <span className="shrink-0 text-right">
+                      <Money
+                        value={service.price}
+                        className="block text-[16px] font-bold"
+                      />
+                      <span className="text-[11.5px] text-text3">/ visit</span>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+
+          {/* Reviews */}
+          <section className="space-y-4">
+            <h2 className="text-panel text-text">
               Reviews ({reviews.length})
             </h2>
 
@@ -166,35 +221,49 @@ export default async function TechnicianProfilePage({
                 description="Once a customer completes a job with this technician, their review shows up here."
               />
             ) : (
-              <ul className="space-y-3">
-                {reviews.map((review) => (
-                  <li key={review.id}>
-                    <Card>
-                      <CardContent className="space-y-1.5">
-                        <div className="flex items-center justify-between gap-3">
-                          <Rating value={review.rating} />
-                          <span className="text-xs text-muted-foreground">
-                            {formatDate(review.createdAt)}
-                          </span>
-                        </div>
-                        {review.comment && (
-                          <p className="text-sm text-pretty">
-                            {review.comment}
-                          </p>
-                        )}
-                      </CardContent>
-                    </Card>
-                  </li>
-                ))}
-              </ul>
+              <>
+                <RatingHistogram
+                  reviews={reviews}
+                  average={technician.avgRating}
+                />
+
+                <ul className="space-y-3">
+                  {reviews.map((review) => (
+                    <li
+                      key={review.id}
+                      className="rounded-card border border-line bg-surface p-5 shadow-sh1"
+                    >
+                      <div className="flex items-center justify-between gap-3">
+                        <span
+                          className="tracking-[1px] text-star"
+                          aria-label={`${review.rating} out of 5`}
+                        >
+                          {"★".repeat(review.rating).padEnd(5, "☆")}
+                        </span>
+                        <span className="font-mono text-[12px] text-text3">
+                          {formatDate(review.createdAt)}
+                        </span>
+                      </div>
+
+                      {review.comment && (
+                        <p className="mt-2 text-body2 text-text2">
+                          {review.comment}
+                        </p>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </>
             )}
           </section>
         </div>
 
-        {/* Booking */}
+        {/* Sticky booking rail */}
         <div>
           <BookingPanel
             technicianId={technician.id}
+            technicianName={name}
+            fromPrice={fromPrice}
             services={services}
             slots={slots}
             isLoggedIn={Boolean(me)}
