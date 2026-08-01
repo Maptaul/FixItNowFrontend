@@ -16,16 +16,16 @@ export type IChipVariant =
   | "amber"
   | "primary"
   | "red"
+  | "red-strong"
   | "violet"
   | "neutral";
 
 /**
  * Booking status presentation.
  *
- * Colours follow the handoff's fixed semantic map, not a per-status palette:
- * emerald = settled/done, amber = waiting on someone, primary = live and
- * moving, red = ended badly. Two statuses sharing a colour is deliberate —
- * every chip carries a word, so status is never colour-only.
+ * Colours follow the assignment's badge legend — seven statuses, seven
+ * distinct chips — expressed entirely in the design handoff's tokens and
+ * chip anatomy. Status is never colour-only: every chip carries its word.
  */
 export const BOOKING_STATUS_META: Record<
   IBookingStatus,
@@ -34,10 +34,10 @@ export const BOOKING_STATUS_META: Record<
   REQUESTED: { label: "Requested", variant: "amber" },
   ACCEPTED: { label: "Accepted", variant: "primary" },
   DECLINED: { label: "Declined", variant: "red" },
-  PAID: { label: "Paid", variant: "emerald" },
-  IN_PROGRESS: { label: "In progress", variant: "primary" },
-  COMPLETED: { label: "Completed", variant: "emerald" },
-  CANCELLED: { label: "Cancelled", variant: "red" },
+  PAID: { label: "Paid", variant: "violet" },
+  IN_PROGRESS: { label: "In progress", variant: "emerald" },
+  COMPLETED: { label: "Completed", variant: "neutral" },
+  CANCELLED: { label: "Cancelled", variant: "red-strong" },
 };
 
 export const PAYMENT_STATUS_META: Record<

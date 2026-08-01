@@ -29,6 +29,9 @@ const badgeVariants = cva(
         amber: "border-amber-border bg-amber-soft text-amber",
         primary: "border-primary-border bg-primary-soft text-primary",
         red: "border-red-border bg-red-soft text-red",
+        // Stronger red for the terminal state, so Cancelled reads as heavier
+        // than Declined without leaving the palette.
+        "red-strong": "border-red bg-red text-white",
         violet: "border-transparent bg-violet-soft text-violet",
         neutral: "border-line bg-surface2 text-text2",
         // Solid fill — the only chip that sits on a coloured surface.
