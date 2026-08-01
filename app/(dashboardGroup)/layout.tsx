@@ -1,4 +1,3 @@
-import { redirect } from "next/navigation";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
 import { UserMenu } from "@/components/shared/user-menu";
 import {
@@ -7,29 +6,13 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { CommandPalette } from "./_components/CommandPalette";
-import { DashboardSidebar } from "./_components/DashboardSidebar";
-import { DashboardBreadcrumb } from "./_components/DashboardBreadcrumb";
-import { ROLE_LABEL } from "./_config/sidebarMenuItems";
 import { getMe } from "@/service/getMe";
+import { redirect } from "next/navigation";
+import { CommandPalette } from "./_components/CommandPalette";
+import { DashboardBreadcrumb } from "./_components/DashboardBreadcrumb";
+import { DashboardSidebar } from "./_components/DashboardSidebar";
+import { ROLE_LABEL } from "./_config/sidebarMenuItems";
 
-/**
- * Shell for every signed-in area — design handoff § Dashboard shell.
- *
- * Sidebar is 248px expanded / 68px collapsed (the handoff's icon rail), and
- * the header is a sticky 62px bar carrying the `Role / Page` breadcrumb and a
- * profile pill.
- *
- * `proxy.ts` already turned away anonymous visitors, but this layout fetches
- * the user anyway: it needs the real role from the database (not the token)
- * to pick the sidebar, and it's the last line of defence if the proxy is ever
- * bypassed.
- *
- * Not built: the handoff's notification drawer. The API has no notification
- * endpoint, and a control that does nothing is worse than no control. The ⌘K
- * affordance next to it *is* built — see `CommandPalette`, which fans out
- * across the endpoints each role can already read.
- */
 export default async function DashboardLayout({
   children,
 }: {

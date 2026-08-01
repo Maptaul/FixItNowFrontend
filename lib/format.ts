@@ -1,9 +1,3 @@
-/**
- * Formatting helpers.
- *
- * Prisma `Decimal` columns arrive as strings ("100", "4.50"), so anything
- * numeric from the API goes through `toNumber` before maths or display.
- */
 
 export const toNumber = (value: string | number | null | undefined): number => {
   const parsed = Number(value ?? 0);

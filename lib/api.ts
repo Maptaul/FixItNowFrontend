@@ -1,21 +1,6 @@
 import { cookies, headers } from "next/headers";
 import { IApiResponse } from "./types";
 
-/**
- * Single gateway to the FixItNow REST API.
- *
- * Every call runs on the Next.js server (Server Component / Server Action),
- * never in the browser. Two reasons:
- *   1. the access token stays in an httpOnly cookie the client can't read;
- *   2. the backend's CORS allow-list is a single origin, and server-to-server
- *      requests aren't subject to CORS at all.
- *
- * `apiFetch` never throws on an HTTP error — it always resolves to the
- * backend's envelope so callers can render a toast or inline message.
- * Only genuinely unexpected failures (DNS, socket) are synthesised into
- * an envelope, so the UI has exactly one error shape to handle.
- */
-
 export const API_URL =
   process.env.NEXT_PUBLIC_API_URL ?? "https://fixitbackend.vercel.app";
 
@@ -32,18 +17,6 @@ export const getAccessToken = async (): Promise<string | undefined> => {
   return cookieStore.get("accessToken")?.value;
 };
 
-/**
- * The public origin this request arrived on — e.g. `http://localhost:3000`
- * or `https://fixit-now-frontend.vercel.app`.
- *
- * Stripe needs an absolute URL to return the customer to after checkout, and
- * the API can't guess which frontend started it: local development and the
- * deployed site are different hosts. Reading it from the live request means
- * it's right on both, and on preview deployments, with nothing to configure.
- *
- * `NEXT_PUBLIC_APP_URL` overrides it when the app sits behind a proxy that
- * rewrites Host.
- */
 export const getAppOrigin = async (): Promise<string> => {
   const configured = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/+$/, "");
   if (configured) return configured;
@@ -78,8 +51,6 @@ export async function apiFetch<T>(
     }
   }
 
-  // Authenticated responses are per-user, so they must never land in the
-  // shared data cache. Public reads opt into caching by passing `next`.
   const cache: RequestCache | undefined =
     rest.cache ?? (auth && !rest.next ? "no-store" : undefined);
 
@@ -107,10 +78,6 @@ export async function apiFetch<T>(
   }
 }
 
-/**
- * Turn a failed envelope into field-keyed messages for inline form errors.
- * The backend reports Zod failures as `errorDetails.issues[]`.
- */
 export function toFieldErrors(
   errorDetails: IApiResponse<unknown>["errorDetails"],
 ): Record<string, string> | undefined {

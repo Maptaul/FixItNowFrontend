@@ -1,21 +1,15 @@
 import { z } from "zod";
 
-/**
- * Client-side schemas.
- *
- * These deliberately mirror the backend's Zod rules so a user sees the
- * failure inline before a request goes out; the server still re-validates
- * everything and its messages are surfaced the same way.
- *
- * Inputs are parsed straight from `FormData`, so every field starts life as
- * a string — numeric fields are coerced here rather than at the call site.
- */
-
 const requiredString = (label: string, min = 1) =>
   z
     .string()
     .trim()
-    .min(min, min === 1 ? `${label} is required` : `${label} must be at least ${min} characters`);
+    .min(
+      min,
+      min === 1
+        ? `${label} is required`
+        : `${label} must be at least ${min} characters`,
+    );
 
 export const loginSchema = z.object({
   email: z.string().trim().pipe(z.email("Enter a valid email address")),
@@ -33,7 +27,11 @@ export const registerSchema = z.object({
 
 export const updateAccountSchema = z
   .object({
-    name: z.string().trim().min(2, "Name must be at least 2 characters").optional(),
+    name: z
+      .string()
+      .trim()
+      .min(2, "Name must be at least 2 characters")
+      .optional(),
     password: z
       .string()
       .min(6, "Password must be at least 6 characters")
@@ -45,7 +43,11 @@ export const updateAccountSchema = z
   });
 
 export const technicianProfileSchema = z.object({
-  bio: z.string().trim().max(1000, "Keep your bio under 1000 characters").optional(),
+  bio: z
+    .string()
+    .trim()
+    .max(1000, "Keep your bio under 1000 characters")
+    .optional(),
   experienceYears: z.coerce
     .number({ message: "Experience must be a number" })
     .int("Experience must be a whole number of years")
@@ -60,7 +62,11 @@ export const technicianProfileSchema = z.object({
 export const serviceSchema = z.object({
   categoryId: requiredString("Category"),
   title: requiredString("Title", 3),
-  description: z.string().trim().max(1000, "Keep the description under 1000 characters").optional(),
+  description: z
+    .string()
+    .trim()
+    .max(1000, "Keep the description under 1000 characters")
+    .optional(),
   price: z.coerce
     .number({ message: "Price must be a number" })
     .positive("Price must be greater than 0"),
@@ -85,7 +91,8 @@ export const bookingSchema = z.object({
     .string()
     .min(1, "Pick a date and time")
     .refine(
-      (value) => !Number.isNaN(Date.parse(value)) && new Date(value) > new Date(),
+      (value) =>
+        !Number.isNaN(Date.parse(value)) && new Date(value) > new Date(),
       "Pick a date and time in the future",
     ),
   slotId: z.string().optional(),
@@ -98,7 +105,11 @@ export const reviewSchema = z.object({
     .int()
     .min(1, "Rating must be between 1 and 5")
     .max(5, "Rating must be between 1 and 5"),
-  comment: z.string().trim().max(1000, "Keep your review under 1000 characters").optional(),
+  comment: z
+    .string()
+    .trim()
+    .max(1000, "Keep your review under 1000 characters")
+    .optional(),
 });
 
 export const categorySchema = z.object({

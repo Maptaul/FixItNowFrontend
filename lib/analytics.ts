@@ -3,26 +3,11 @@ import { BOOKING_STATUS_META } from "./constants";
 import { formatCurrency, toNumber } from "./format";
 import { IBooking, IBookingStatus, IPayment, IUser } from "./types";
 
-/**
- * Chart data derived from bookings.
- *
- * The API has no analytics endpoints, so every number here is computed from
- * the booking list a role already fetches. That keeps the charts honest —
- * they can only ever show what the platform actually recorded — at the cost
- * of being bounded by whatever that list contains.
- */
-
 const DAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 const dayKey = (date: Date): string =>
   `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
 
-/**
- * Money recognised per day over the trailing `days` window.
- *
- * A booking counts on the day it was last updated, because that's the closest
- * the API gets to "when it completed" — there is no completedAt column.
- */
 export function earningsByDay(
   bookings: IBooking[],
   days = 7,
@@ -66,12 +51,6 @@ export function earningsByDay(
   return { bars, total };
 }
 
-/**
- * Money and job count per calendar month over the trailing `months` window.
- *
- * Same caveat as the daily version: a booking counts in the month it was last
- * updated, because the API has no `completedAt`.
- */
 export function earningsByMonth(
   bookings: IBooking[],
   months = 7,
@@ -179,7 +158,9 @@ export function revenueByService(bookings: IBooking[], limit = 6): Metric[] {
     totals.set(title, (totals.get(title) ?? 0) + toNumber(booking.totalAmount));
   }
 
-  const rows = [...totals.entries()].sort((a, b) => b[1] - a[1]).slice(0, limit);
+  const rows = [...totals.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, limit);
   const max = rows[0]?.[1] ?? 0;
 
   return rows.map(([label, value]) => ({
@@ -192,10 +173,6 @@ export function revenueByService(bookings: IBooking[], limit = 6): Metric[] {
   }));
 }
 
-/**
- * When customers actually book, by hour of the scheduled slot. Useful for
- * deciding which hours to open on the availability calendar.
- */
 export function busiestHours(bookings: IBooking[], limit = 5): Metric[] {
   const counts = new Map<number, number>();
 
@@ -204,7 +181,9 @@ export function busiestHours(bookings: IBooking[], limit = 5): Metric[] {
     counts.set(hour, (counts.get(hour) ?? 0) + 1);
   }
 
-  const rows = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, limit);
+  const rows = [...counts.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, limit);
   const max = rows[0]?.[1] ?? 0;
 
   const label = (hour: number) => {
@@ -222,20 +201,18 @@ export function busiestHours(bookings: IBooking[], limit = 5): Metric[] {
   }));
 }
 
-/**
- * Bookings by status as horizontal bars with a count — the handoff's admin
- * treatment, which reads far better than a column chart when the categories
- * are named states rather than a time series.
- */
 export function statusSplit(bookings: IBooking[]): Metric[] {
-  const rows: { label: string; match: IBookingStatus[]; tone: Metric["tone"] }[] =
-    [
-      { label: "Completed", match: ["COMPLETED"], tone: "emerald" },
-      { label: "In progress", match: ["IN_PROGRESS", "PAID"], tone: "primary" },
-      { label: "Pending accept", match: ["REQUESTED"], tone: "amber" },
-      { label: "Accepted", match: ["ACCEPTED"], tone: "violet" },
-      { label: "Cancelled", match: ["CANCELLED", "DECLINED"], tone: "red" },
-    ];
+  const rows: {
+    label: string;
+    match: IBookingStatus[];
+    tone: Metric["tone"];
+  }[] = [
+    { label: "Completed", match: ["COMPLETED"], tone: "emerald" },
+    { label: "In progress", match: ["IN_PROGRESS", "PAID"], tone: "primary" },
+    { label: "Pending accept", match: ["REQUESTED"], tone: "amber" },
+    { label: "Accepted", match: ["ACCEPTED"], tone: "violet" },
+    { label: "Cancelled", match: ["CANCELLED", "DECLINED"], tone: "red" },
+  ];
 
   const max = Math.max(
     ...rows.map(
@@ -260,11 +237,6 @@ export function statusSplit(bookings: IBooking[]): Metric[] {
   });
 }
 
-/**
- * Period-over-period change, e.g. the last 30 days against the 30 before it.
- * Returns `null` when there's no prior period to compare against — a "+100%"
- * badge on a platform's first month is noise, not insight.
- */
 export function periodDelta(
   bookings: IBooking[],
   days = 30,
@@ -300,14 +272,6 @@ export type ActivityItem = {
   tone: "emerald" | "primary" | "amber" | "red" | "violet";
 };
 
-/**
- * Recent activity feed — design handoff § Admin › Overview.
- *
- * The API has no event log, so this reconstructs one from the timestamps
- * records already carry: bookings when they were placed, payments when they
- * settled, users when they joined. It's a genuine history, just derived —
- * which also means it can only show what those three resources record.
- */
 export function recentActivity(
   bookings: IBooking[],
   payments: IPayment[],
@@ -396,11 +360,6 @@ export function bookingsByStatus(bookings: IBooking[]): Bar[] {
   });
 }
 
-/**
- * Technician performance, as percentages of their own booking history.
- * Returns `null` when there's nothing to measure — an empty chart claiming
- * 0% acceptance would be a lie about a technician who's had no requests.
- */
 export function technicianPerformance(bookings: IBooking[]) {
   if (bookings.length === 0) return null;
 
@@ -411,7 +370,8 @@ export function technicianPerformance(bookings: IBooking[]) {
   ).length;
 
   const accepted = bookings.filter(
-    (booking) => booking.status !== "DECLINED" && booking.status !== "REQUESTED",
+    (booking) =>
+      booking.status !== "DECLINED" && booking.status !== "REQUESTED",
   ).length;
 
   const completed = bookings.filter(

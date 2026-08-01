@@ -13,18 +13,6 @@ import { StatCard } from "../../../_components/StatCard";
 
 export const metadata: Metadata = { title: "Payments" };
 
-/**
- * Platform-wide payments — design handoff § Admin › Payments.
- *
- * `GET /api/payments` returns every payment when the caller is an admin
- * (`where = role === "ADMIN" ? {} : { booking: { customerId } }`), so this is
- * the same endpoint the customer screen uses, unfiltered.
- *
- * The handoff's other three cards are commission, refunded and open disputes.
- * None of those exist in this API — there's no commission split, no refund
- * record and no dispute model — so the cards show what the payment table can
- * actually prove: collected, still clearing, and failed.
- */
 export default async function AdminPaymentsPage() {
   const payments = await getMyPayments();
 

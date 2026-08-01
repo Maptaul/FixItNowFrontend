@@ -6,10 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 
 export const metadata: Metadata = { title: "Payment cancelled" };
 
-/**
- * Where Stripe sends the customer if they back out of checkout.
- * Nothing was charged and the booking stays ACCEPTED, so they can retry.
- */
+
 export default function PaymentCancelPage() {
   return (
     <div className="mx-auto w-full max-w-lg py-8">

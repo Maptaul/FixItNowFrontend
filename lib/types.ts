@@ -1,14 +1,6 @@
 import { LucideProps } from "lucide-react";
 import { ForwardRefExoticComponent, RefAttributes } from "react";
 
-/* ---------------------------------------------------------------- *
- * Backend envelope
- *
- * Every FixItNow API response is shaped by `sendResponse` on the
- * server: `{ success, statusCode, message, data, meta? }` on success
- * and `{ success, statusCode, message, errorDetails }` on failure.
- * ---------------------------------------------------------------- */
-
 export type IMeta = {
   page: number;
   limit: number;
@@ -52,14 +44,6 @@ export type IBookingStatus =
 
 export type IPaymentStatus = "PENDING" | "COMPLETED" | "FAILED";
 export type IPaymentProvider = "STRIPE" | "SSLCOMMERZ";
-
-/* ---------------------------------------------------------------- *
- * Domain models
- *
- * NOTE: Prisma `Decimal` columns are serialised as **strings**
- * (`"100"`, `"4.50"`). Always run them through `Number()` or the
- * helpers in `lib/format.ts` before doing maths or formatting.
- * ---------------------------------------------------------------- */
 
 export type ICategory = {
   id: string;

@@ -1,15 +1,6 @@
 import { formatDateTime } from "./format";
 import { IBooking, IBookingStatus } from "./types";
 
-/**
- * Turns a booking into the steps the vertical timeline renders.
- *
- * The happy path is a straight line, so it's expressed as an ordered list and
- * an index rather than a pile of conditionals: everything before the current
- * status is done, the status itself is current, everything after is upcoming.
- * The two terminal states (declined, cancelled) truncate the line and append
- * their own step, because nothing after them will ever happen.
- */
 export type BookingTimelineStep = {
   label: string;
   state: "done" | "current" | "upcoming";
@@ -55,7 +46,10 @@ export function buildBookingTimeline(booking: IBooking): BookingTimelineStep[] {
       ...FLOW.slice(0, reached).map((status) => ({
         label: STEP_LABEL[status],
         state: "done" as const,
-        meta: status === "REQUESTED" ? formatDateTime(booking.createdAt) : undefined,
+        meta:
+          status === "REQUESTED"
+            ? formatDateTime(booking.createdAt)
+            : undefined,
       })),
       {
         label: isDeclined ? "Technician declined" : "Booking cancelled",
@@ -89,10 +83,6 @@ export function buildBookingTimeline(booking: IBooking): BookingTimelineStep[] {
   }));
 }
 
-/**
- * How far a cancelled booking got. A payment record that completed means it
- * reached PAID; otherwise acceptance is the furthest we can prove.
- */
 function lastReachedIndex(booking: IBooking): number {
   if (booking.payment?.status === "COMPLETED") return 3;
   return booking.payment ? 2 : 1;

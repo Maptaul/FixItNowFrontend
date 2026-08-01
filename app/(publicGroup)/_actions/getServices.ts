@@ -14,11 +14,7 @@ export type ServiceFilters = {
   limit?: string | number;
 };
 
-/**
- * Public service listing with every filter the API supports.
- * Cached briefly under `services` so browsing feels instant while still
- * picking up a technician's new listings within the minute.
- */
+
 export const getServices = async (
   filters: ServiceFilters = {},
 ): Promise<{ services: IService[]; meta: IMeta }> => {

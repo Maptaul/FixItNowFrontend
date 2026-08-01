@@ -31,11 +31,7 @@ export default async function CustomerPaymentsPage() {
         description="Every Stripe charge against your bookings, with the reference you'd quote to support."
       />
 
-      {/*
-       * The handoff's third stat card is "pending refund". The API has no
-       * refund model, so this shows what's still clearing instead — a number
-       * we can actually stand behind.
-       */}
+      
       <div className="grid gap-4 sm:grid-cols-3">
         <StatCard
           icon={WalletIcon}

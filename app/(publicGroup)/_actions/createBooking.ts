@@ -6,13 +6,7 @@ import { IBooking, IFormState } from "@/lib/types";
 import { bookingSchema, zodFieldErrors } from "@/lib/validations";
 import { getMe } from "@/service/getMe";
 
-/**
- * Send a booking request for a service.
- *
- * The customer picks either a published availability slot (which reserves it)
- * or a free-form date and time. Success is reported back to the form rather
- * than redirecting, so the panel can show a confirmation in place.
- */
+
 export const createBooking = async (
   technicianId: string,
   _prevState: IFormState,

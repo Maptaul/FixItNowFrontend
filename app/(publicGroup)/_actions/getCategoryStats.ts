@@ -11,15 +11,7 @@ export type ICategoryStat = ICategory & {
   fromPrice: number | null;
 };
 
-/**
- * Category cards on the home page show a technician count and a "from" price.
- * The API has no aggregate endpoint for that, so this derives both from one
- * page of services rather than firing a request per category.
- *
- * The cap is deliberate: the home page shows eight cards, and a single wide
- * read is cheaper than N round-trips. If the catalogue outgrows it, the
- * honest fix is an aggregate endpoint on the backend, not a bigger limit.
- */
+
 export const getCategoryStats = async (
   limit = 8,
 ): Promise<ICategoryStat[]> => {

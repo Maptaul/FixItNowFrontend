@@ -1,18 +1,5 @@
-import jwt, { JwtPayload } from "jsonwebtoken";
 import { IAuthUser } from "@/lib/types";
-
-/**
- * Token helpers used by the proxy (route protection) and the auth actions.
- *
- * Authorization is *never* decided here alone. The backend re-verifies every
- * token and re-reads the user's role and ban status from the database on each
- * request, so the worst a tampered cookie can do is render an empty shell
- * whose data calls all fail. This module exists to route people sensibly.
- *
- * When `JWT_ACCESS_SECRET` is configured (it should be — same value as the
- * backend) the signature is verified here too, and a forged cookie never
- * gets past the proxy at all.
- */
+import jwt, { JwtPayload } from "jsonwebtoken";
 
 export type VerifyResult =
   | { success: true; data: IAuthUser }
@@ -47,7 +34,6 @@ const verifyToken = (token: string): VerifyResult => {
   }
 };
 
-/** Read the signed-in user's claims, or `null` when there's no valid token. */
 const getUserFromToken = (token: string | undefined): IAuthUser | null => {
   if (!token) return null;
   const result = verifyToken(token);

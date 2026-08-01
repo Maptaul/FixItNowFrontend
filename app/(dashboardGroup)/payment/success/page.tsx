@@ -7,13 +7,7 @@ import { confirmPayment } from "../../_actions/paymentActions";
 
 export const metadata: Metadata = { title: "Payment complete" };
 
-/**
- * Where Stripe sends the customer after a successful checkout.
- *
- * Stripe's webhook marks the booking PAID server-side, but that can land a
- * moment later — confirming here means the customer sees the new status the
- * instant they arrive rather than a stale "Accepted".
- */
+
 export default async function PaymentSuccessPage({
   searchParams,
 }: {

@@ -4,18 +4,7 @@ import { ROLE_HOME } from "@/lib/constants";
 import { IRole } from "@/lib/types";
 import { jwtUtils } from "@/utils/jwt";
 
-/**
- * Route protection (Next.js 16 renamed `middleware.ts` to `proxy.ts`).
- *
- * Three jobs, all of them about sending people to the right place:
- *   1. anonymous visitor hits a private route  → /auth/login?redirectTo=…
- *   2. signed-in user hits /auth/*             → their own dashboard
- *   3. signed-in user hits another role's area → their own dashboard
- *
- * This is navigation, not authorization. Every byte of data is fetched
- * server-side from an API that re-checks the token and the user's current
- * role and ban status, so a tampered cookie buys nothing but an empty page.
- */
+
 
 const AUTH_ROUTES = ["/auth/login", "/auth/register"];
 

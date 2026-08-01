@@ -16,13 +16,7 @@ const safeRedirect = (value: string | undefined): string | null => {
   return value.startsWith("/") && !value.startsWith("//") ? value : null;
 };
 
-/**
- * Log in and store the returned JWT in an httpOnly cookie.
- *
- * The token lives only on the server: `proxy.ts` reads it to route requests
- * and `lib/api.ts` forwards it as a Bearer header. It's never exposed to
- * client JavaScript, so an XSS bug can't walk off with the session.
- */
+
 export const loginAction = async (
   redirectTo: string | undefined,
   _prevState: IFormState,
@@ -78,12 +72,7 @@ export const loginAction = async (
   redirect(safeRedirect(redirectTo) ?? ROLE_HOME[user.role]);
 };
 
-/**
- * Register as a customer or technician.
- *
- * The API creates an empty technician profile alongside a TECHNICIAN account,
- * which is why new technicians land straight on their profile setup screen.
- */
+
 export const registerAction = async (
   _prevState: IFormState,
   formData: FormData,

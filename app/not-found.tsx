@@ -1,11 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
-/**
- * 404 — design handoff § UI states › Full-page.
- * The code renders at 52px mono/700, and the copy points somewhere useful
- * rather than apologising.
- */
+
 export default function NotFound() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-5 px-5 text-center">

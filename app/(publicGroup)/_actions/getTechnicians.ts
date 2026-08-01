@@ -28,10 +28,7 @@ export const getTechnicians = async (
   };
 };
 
-/**
- * A single technician with their services, reviews and upcoming slots.
- * Returns `null` on 404 so the page can call `notFound()`.
- */
+
 export const getTechnicianById = async (
   id: string,
 ): Promise<ITechnicianProfile | null> => {

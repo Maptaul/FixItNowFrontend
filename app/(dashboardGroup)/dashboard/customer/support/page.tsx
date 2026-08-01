@@ -11,17 +11,6 @@ import { PageHeader } from "../../../_components/PageHeader";
 
 export const metadata: Metadata = { title: "Help centre" };
 
-/**
- * Help centre — design handoff § Customer › Help center.
- *
- * Three contact cards with tinted icon tiles, then the FAQ accordion.
- *
- * The handoff's cards are live chat, a phone number and "report a problem".
- * There is no messaging, telephony or ticketing endpoint here, and printing a
- * support number nobody answers would be worse than printing none — so the
- * cards route to the places that genuinely resolve the questions customers
- * actually arrive with.
- */
 const ROUTES = [
   {
     icon: ClipboardListIcon,
