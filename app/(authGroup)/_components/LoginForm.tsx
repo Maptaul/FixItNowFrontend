@@ -10,11 +10,6 @@ import { useActionState, useEffect } from "react";
 import { toast } from "sonner";
 import { loginAction } from "../_actions/authActions";
 
-/** Demo accounts, so a reviewer can get in without creating anything. */
-const DEMO_ACCOUNTS = [
-  { label: "Admin", email: "admin@fixitnow.com", password: "admin123" },
-];
-
 export function LoginForm() {
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get("redirectTo") ?? undefined;
@@ -92,21 +87,11 @@ export function LoginForm() {
         </Link>
       </p>
 
-      {/* <div className="rounded-lg border border-dashed p-3">
-        <p className="text-xs font-medium text-muted-foreground">
-          Reviewer credentials
-        </p>
-        <ul className="mt-1.5 space-y-0.5">
-          {DEMO_ACCOUNTS.map((account) => (
-            <li key={account.email} className="text-xs text-muted-foreground">
-              <span className="font-medium text-foreground">
-                {account.label}
-              </span>{" "}
-              — {account.email} / {account.password}
-            </li>
-          ))}
-        </ul>
-      </div> */}
+      {/*
+       * The on-screen reviewer credentials block was removed deliberately —
+       * the admin login lives in README.md, where the assignment asks for it,
+       * rather than on a public page.
+       */}
     </div>
   );
 }

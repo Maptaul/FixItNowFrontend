@@ -39,7 +39,7 @@ export function DashboardSidebar({ user }: { user: IUser }) {
   return (
     <Sidebar collapsible="icon" className="border-line">
       <SidebarHeader className="border-b border-line px-3 py-4">
-        <Link href="/" className="flex-2 items-center gap-2.5 overflow-hidden">
+        <Link href="/" className="flex items-center gap-2.5 overflow-hidden">
           <Logo />
           <span className="min-w-0 group-data-[collapsible=icon]:hidden">
             <span className="block truncate text-[11.5px] font-medium text-text3">
