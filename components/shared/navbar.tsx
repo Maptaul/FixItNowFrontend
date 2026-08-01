@@ -20,8 +20,8 @@ import { getMe } from "@/service/getMe";
 const NAV_LINKS = [
   { href: "/services", label: "Services" },
   { href: "/technicians", label: "Technicians" },
-  { href: "/#how-it-works", label: "How it works" },
-  { href: "/services", label: "Pricing" },
+  { href: "/how-it-works", label: "How it works" },
+  { href: "/pricing", label: "Pricing" },
 ];
 
 export async function Navbar() {

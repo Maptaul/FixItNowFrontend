@@ -187,9 +187,17 @@ export default function HomePage() {
         className="mx-auto w-full max-w-[1240px] px-5 pb-[72px] lg:px-10"
       >
         <div className="rounded-modal border border-line bg-surface p-7 shadow-sh2 lg:p-12">
-          <h2 className="mb-9 text-[24px] font-extrabold tracking-[-0.03em] text-text lg:text-section">
-            How FixItNow works
-          </h2>
+          <div className="mb-9 flex flex-wrap items-center justify-between gap-3">
+            <h2 className="text-[24px] font-extrabold tracking-[-0.03em] text-text lg:text-section">
+              How FixItNow works
+            </h2>
+            <Link
+              href="/how-it-works"
+              className="text-btn text-primary hover:text-primary-hover"
+            >
+              Every step in detail →
+            </Link>
+          </div>
 
           <ol className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
             {HOW_IT_WORKS.map((item) => (
