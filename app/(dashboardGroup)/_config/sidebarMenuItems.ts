@@ -5,6 +5,7 @@ import {
   CreditCardIcon,
   LayoutDashboardIcon,
   ShapesIcon,
+  StarIcon,
   UserIcon,
   UsersIcon,
   WrenchIcon,
@@ -29,6 +30,7 @@ const customerSidebarItems: ISidebarItem[] = [
     href: "/dashboard/customer/payments",
     icon: CreditCardIcon,
   },
+  { label: "Reviews", href: "/dashboard/customer/reviews", icon: StarIcon },
   { label: "My profile", href: "/dashboard/customer/profile", icon: UserIcon },
 ];
 
