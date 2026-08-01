@@ -12,12 +12,13 @@ export function Logo({
   className?: string;
 }) {
   return (
-    <Link href={href} className={cn("flex items-center gap-2.5", className)}>
+    <Link href={href} className={cn("flex-2 items-center gap-2.5", className)}>
       <Image
         src={logo}
         alt="FixItNow Logo"
         width={50}
         height={50}
+        unoptimized
         className="h-10 w-auto rounded-md object-contain"
       />
     </Link>
