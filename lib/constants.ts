@@ -8,68 +8,45 @@ export const ROLE_HOME: Record<IRole, string> = {
 };
 
 /**
- * Booking status presentation. Colours follow the spec's badge legend:
- * requested amber, accepted blue, declined red, paid purple,
- * in-progress green, completed grey, cancelled dark red.
+ * Chip variant vocabulary from the design handoff. Every status in the
+ * product maps onto one of these — see components/ui/badge.tsx.
+ */
+export type IChipVariant =
+  | "emerald"
+  | "amber"
+  | "primary"
+  | "red"
+  | "violet"
+  | "neutral";
+
+/**
+ * Booking status presentation.
+ *
+ * Colours follow the handoff's fixed semantic map, not a per-status palette:
+ * emerald = settled/done, amber = waiting on someone, primary = live and
+ * moving, red = ended badly. Two statuses sharing a colour is deliberate —
+ * every chip carries a word, so status is never colour-only.
  */
 export const BOOKING_STATUS_META: Record<
   IBookingStatus,
-  { label: string; className: string }
+  { label: string; variant: IChipVariant }
 > = {
-  REQUESTED: {
-    label: "Requested",
-    className:
-      "border-amber-500/30 bg-amber-500/12 text-amber-700 dark:text-amber-300",
-  },
-  ACCEPTED: {
-    label: "Accepted",
-    className:
-      "border-blue-500/30 bg-blue-500/12 text-blue-700 dark:text-blue-300",
-  },
-  DECLINED: {
-    label: "Declined",
-    className: "border-red-500/30 bg-red-500/12 text-red-700 dark:text-red-300",
-  },
-  PAID: {
-    label: "Paid",
-    className:
-      "border-purple-500/30 bg-purple-500/12 text-purple-700 dark:text-purple-300",
-  },
-  IN_PROGRESS: {
-    label: "In progress",
-    className:
-      "border-green-500/30 bg-green-500/12 text-green-700 dark:text-green-300",
-  },
-  COMPLETED: {
-    label: "Completed",
-    className:
-      "border-zinc-500/30 bg-zinc-500/12 text-zinc-700 dark:text-zinc-300",
-  },
-  CANCELLED: {
-    label: "Cancelled",
-    className:
-      "border-rose-900/30 bg-rose-900/12 text-rose-900 dark:text-rose-300",
-  },
+  REQUESTED: { label: "Requested", variant: "amber" },
+  ACCEPTED: { label: "Accepted", variant: "primary" },
+  DECLINED: { label: "Declined", variant: "red" },
+  PAID: { label: "Paid", variant: "emerald" },
+  IN_PROGRESS: { label: "In progress", variant: "primary" },
+  COMPLETED: { label: "Completed", variant: "emerald" },
+  CANCELLED: { label: "Cancelled", variant: "red" },
 };
 
 export const PAYMENT_STATUS_META: Record<
   IPaymentStatus,
-  { label: string; className: string }
+  { label: string; variant: IChipVariant }
 > = {
-  PENDING: {
-    label: "Pending",
-    className:
-      "border-amber-500/30 bg-amber-500/12 text-amber-700 dark:text-amber-300",
-  },
-  COMPLETED: {
-    label: "Paid",
-    className:
-      "border-green-500/30 bg-green-500/12 text-green-700 dark:text-green-300",
-  },
-  FAILED: {
-    label: "Failed",
-    className: "border-red-500/30 bg-red-500/12 text-red-700 dark:text-red-300",
-  },
+  PENDING: { label: "Clearing", variant: "amber" },
+  COMPLETED: { label: "Settled", variant: "emerald" },
+  FAILED: { label: "Failed", variant: "red" },
 };
 
 /*

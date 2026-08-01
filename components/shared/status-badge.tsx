@@ -13,7 +13,7 @@ export function BookingStatusBadge({
   const meta = BOOKING_STATUS_META[status];
 
   return (
-    <Badge variant="outline" className={cn(meta.className, className)}>
+    <Badge variant={meta.variant} className={cn(className)}>
       {meta.label}
     </Badge>
   );
@@ -29,7 +29,7 @@ export function PaymentStatusBadge({
   const meta = PAYMENT_STATUS_META[status];
 
   return (
-    <Badge variant="outline" className={cn(meta.className, className)}>
+    <Badge variant={meta.variant} className={cn(className)}>
       {meta.label}
     </Badge>
   );
