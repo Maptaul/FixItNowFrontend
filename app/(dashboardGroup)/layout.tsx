@@ -7,6 +7,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { CommandPalette } from "./_components/CommandPalette";
 import { DashboardSidebar } from "./_components/DashboardSidebar";
 import { DashboardBreadcrumb } from "./_components/DashboardBreadcrumb";
 import { ROLE_LABEL } from "./_config/sidebarMenuItems";
@@ -59,6 +60,7 @@ export default async function DashboardLayout({
             <DashboardBreadcrumb role={ROLE_LABEL[user.role]} />
 
             <div className="ml-auto flex items-center gap-2">
+              <CommandPalette role={user.role} />
               <ThemeToggle />
 
               <span className="hidden sm:block">
