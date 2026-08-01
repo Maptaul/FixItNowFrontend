@@ -23,15 +23,15 @@ Customer and technician accounts can be created from `/auth/register`.
 
 ## 🛠️ Tech stack
 
-| Tech | Purpose |
-|---|---|
-| Next.js 16 (App Router) | routing, Server Components, Server Actions |
-| TypeScript (strict) | type safety |
-| Tailwind CSS 4 + shadcn/ui | design system, dark mode |
-| Zod | schema validation, shared by client and server actions |
-| sonner | toast notifications |
-| jsonwebtoken | decoding the session cookie in `proxy.ts` |
-| Stripe Checkout | payments (hosted redirect) |
+| Tech                       | Purpose                                                |
+| -------------------------- | ------------------------------------------------------ |
+| Next.js 16 (App Router)    | routing, Server Components, Server Actions             |
+| TypeScript (strict)        | type safety                                            |
+| Tailwind CSS 4 + shadcn/ui | design system, dark mode                               |
+| Zod                        | schema validation, shared by client and server actions |
+| sonner                     | toast notifications                                    |
+| jsonwebtoken               | decoding the session cookie in `proxy.ts`              |
+| Stripe Checkout            | payments (hosted redirect)                             |
 
 **Package manager: pnpm.**
 
@@ -49,25 +49,26 @@ Runs on `http://localhost:3000`.
 
 ### Environment
 
-| Variable | Required | Notes |
-|---|---|---|
-| `NEXT_PUBLIC_API_URL` | yes | `https://fixitbackend.vercel.app`, or `http://localhost:5000` against a local API |
-| `JWT_ACCESS_SECRET` | no | same value as the backend. When set, `proxy.ts` verifies the cookie's signature instead of merely decoding it. The API verifies regardless. |
+| Variable              | Required | Notes                                                                                                                                       |
+| --------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_API_URL` | yes      | `https://fixitbackend.vercel.app`, or `http://localhost:5000` against a local API                                                           |
+| `JWT_ACCESS_SECRET`   | no       | same value as the backend. When set, `proxy.ts` verifies the cookie's signature instead of merely decoding it. The API verifies regardless. |
 
 ### Scripts
 
-| Script | Does |
-|---|---|
-| `pnpm dev` | dev server |
+| Script       | Does             |
+| ------------ | ---------------- |
+| `pnpm dev`   | dev server       |
 | `pnpm build` | production build |
-| `pnpm start` | serve the build |
-| `pnpm lint` | eslint |
+| `pnpm start` | serve the build  |
+| `pnpm lint`  | eslint           |
 
 ---
 
 ## ✨ Features
 
 ### Public
+
 - Responsive service and technician grids with `next/image`, ratings and
   starting prices
 - Filter by category, location, price range, minimum rating and keyword —
@@ -81,6 +82,7 @@ Runs on `http://localhost:3000`.
   plus what the platform does and doesn't charge for
 
 ### Customer
+
 - Register / log in with inline validation
 - Book a service into a published slot — taken slots stay visible but
   disabled — or propose your own date and time
@@ -91,6 +93,7 @@ Runs on `http://localhost:3000`.
 - Help centre with FAQs and routing into the right screen for each problem
 
 ### Technician
+
 - Dashboard with pending requests, jobs in flight, earnings and rating
 - Trade profile: bio, experience, hourly rate, service area
 - Service CRUD
@@ -103,6 +106,7 @@ Runs on `http://localhost:3000`.
 - Reviews inbox with a rating histogram
 
 ### Admin
+
 - Platform overview: users, technicians, bookings, revenue, categories
 - User directory with search, role filter, pagination and ban/unban
 - Service category management
@@ -110,6 +114,7 @@ Runs on `http://localhost:3000`.
 - Every payment on the platform, filterable by status, with revenue totals
 
 ### Throughout
+
 - Role-based UI — each role gets its own sidebar and dashboard, not one menu
   with items hidden
 - **⌘K search** across everything the signed-in role may read — its own
@@ -197,15 +202,15 @@ REQUESTED ──accept──> ACCEPTED ──pay──> PAID ──start──> 
     └──decline──> DECLINED     cancel (customer, before work starts) ──> CANCELLED      └──> review
 ```
 
-| Status | Badge | Who acts next |
-|---|---|---|
-| `REQUESTED` | amber | technician accepts or declines |
-| `ACCEPTED` | blue | customer pays |
-| `DECLINED` | red | — |
-| `PAID` | purple | technician starts the job |
-| `IN_PROGRESS` | green | technician completes it |
-| `COMPLETED` | grey | customer reviews |
-| `CANCELLED` | dark red | — |
+| Status        | Badge    | Who acts next                  |
+| ------------- | -------- | ------------------------------ |
+| `REQUESTED`   | amber    | technician accepts or declines |
+| `ACCEPTED`    | blue     | customer pays                  |
+| `DECLINED`    | red      | —                              |
+| `PAID`        | purple   | technician starts the job      |
+| `IN_PROGRESS` | green    | technician completes it        |
+| `COMPLETED`   | grey     | customer reviews               |
+| `CANCELLED`   | dark red | —                              |
 
 These rules are mirrored in `lib/constants.ts` so the UI only ever offers an
 action the API will accept. The API re-checks every one.
@@ -227,8 +232,8 @@ plus a manual click-through as each role.
 ## 📦 Submission
 
 ```text
-Frontend Repo    : <your GitHub URL>
-Live Frontend    : <your Vercel URL>
+Frontend Repo    : https://github.com/Maptaul/FixItNowFrontend
+Live Frontend    : https://fixit-now-frontend.vercel.app
 Backend API      : https://fixitbackend.vercel.app
 Demo Video       : <your Loom/Drive URL>
 Admin Email      : admin@fixitnow.com
