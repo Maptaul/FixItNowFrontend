@@ -150,7 +150,7 @@ fail, rather than pretending the whole batch succeeded.
 
 ## Route → endpoint summary
 
-All 25 routes.
+All 27 routes, checked against `app/**/page.tsx`.
 
 | Route | Endpoints |
 |---|---|
@@ -174,6 +174,7 @@ All 25 routes.
 | `/dashboard/technician/bookings` | `GET /api/technician/bookings`, `PATCH /api/technician/bookings/:id` |
 | `/dashboard/technician/services` | `GET /api/technicians/:id`, `GET /api/categories`, `POST`/`PUT`/`DELETE /api/technician/services` |
 | `/dashboard/technician/availability` | `GET`/`PUT /api/technician/availability` |
+| `/dashboard/technician/earnings` | `GET /api/technician/bookings` |
 | `/dashboard/technician/profile` | `GET /api/auth/me`, `GET /api/technicians/:id`, `GET /api/technician/availability`, `PUT /api/technician/profile`, `PUT /api/auth/my-profile` |
 | `/dashboard/admin` | `GET /api/admin/users`, `GET /api/admin/bookings`, `GET /api/admin/categories` |
 | `/dashboard/admin/users` | `GET /api/admin/users`, `PATCH /api/admin/users/:id` |
@@ -195,6 +196,9 @@ is derived — treat it as a view, not a source of truth.
 | Category booking volume | `GET /api/admin/bookings` joined to categories via a `serviceId → categoryId` map (admin bookings only return `service: { id, title }`) | [`adminActions.ts`](<app/(dashboardGroup)/_actions/adminActions.ts>) |
 | Category supply chip (Live / Low supply / No technicians) | technician count per category | same |
 | Technician 7-day earnings, admin 7-day revenue | booking `totalAmount` bucketed by `updatedAt` — there is no `completedAt` column | [`lib/analytics.ts`](lib/analytics.ts) |
+| Technician monthly earnings + jobs (7-month chart) | same bucketing, by calendar month | same |
+| Earnings ledger, "in progress" money, average job | technician bookings past payment (`PAID`, `IN_PROGRESS`, `COMPLETED`) | `EarningsTable.tsx`, `/dashboard/technician/earnings` |
+| Admin gross booking value, cancellation share | admin bookings by status | `/dashboard/admin/bookings` |
 | Acceptance / completion / cancellation rates | booking status distribution; returns `null` on an empty history rather than claiming 0% | same |
 | Bookings-by-status chart | `GET /api/admin/bookings` | same |
 | Booking lifecycle timeline | booking `status`, `createdAt`, `updatedAt`, `payment` | [`lib/booking-timeline.ts`](lib/booking-timeline.ts) |
@@ -299,7 +303,7 @@ screen would have meant showing data the platform never recorded.
 | Edit / delete a review | no update or delete endpoint |
 | Blocked dates with reasons | no blocked-date model |
 | Messages / chat | no messaging endpoints |
-| Earnings, withdrawals, payouts, commission | no payout model |
+| "Available to withdraw", the Withdraw screen, commission and payout rows | no payout, commission or withdrawal model — money moves customer → Stripe and nothing records a transfer to the technician. `/dashboard/technician/earnings` shows what *was* earned instead |
 | Notification drawer, ⌘K search | no notification or search endpoints |
 | Audit log, review moderation, technician approvals | no such resources |
 | Category slug, stored base price, Live/Draft status | category is `{ id, name, icon }` — the table derives what it can and says so |
