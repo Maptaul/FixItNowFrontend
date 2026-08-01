@@ -13,59 +13,73 @@ import {
 } from "@/components/ui/sheet";
 import { getMe } from "@/service/getMe";
 
+/**
+ * Public site header — 70px sticky glass bar (--glass + blur(14px)) with a
+ * 1px bottom border, per the handoff.
+ */
 const NAV_LINKS = [
-  { href: "/", label: "Home" },
-  { href: "/services", label: "Browse services" },
+  { href: "/services", label: "Services" },
   { href: "/technicians", label: "Technicians" },
+  { href: "/#how-it-works", label: "How it works" },
+  { href: "/services", label: "Pricing" },
 ];
 
 export async function Navbar() {
   const user = await getMe();
 
   return (
-    <header className="sticky top-0 z-40 border-b bg-background/85 backdrop-blur-md">
-      <nav className="mx-auto flex h-16 w-full max-w-6xl items-center gap-4 px-4">
+    <header className="fx-glass sticky top-0 z-50 h-[70px] border-b border-line">
+      <nav className="mx-auto flex h-full w-full max-w-[1240px] items-center gap-8 px-5 lg:px-10">
         <Logo />
 
-        <ul className="ml-4 hidden items-center gap-1 md:flex">
+        <ul className="hidden items-center gap-[26px] text-body font-medium text-text2 lg:flex">
           {NAV_LINKS.map((link) => (
-            <li key={link.href}>
-              <Button variant="ghost" size="sm" asChild>
-                <Link href={link.href}>{link.label}</Link>
-              </Button>
+            <li key={link.label}>
+              <Link
+                href={link.href}
+                className="text-text2 transition-colors duration-120 hover:text-text"
+              >
+                {link.label}
+              </Link>
             </li>
           ))}
         </ul>
 
-        <div className="ml-auto flex items-center gap-2">
+        <div className="ml-auto flex items-center gap-3">
           <ThemeToggle />
 
           {user ? (
             <UserMenu user={user} />
           ) : (
-            <div className="hidden items-center gap-2 sm:flex">
-              <Button variant="ghost" size="sm" asChild>
+            <>
+              <Link
+                href="/auth/register?role=TECHNICIAN"
+                className="hidden text-btn text-text2 transition-colors duration-120 hover:text-text xl:block"
+              >
+                Become a technician
+              </Link>
+              <Button variant="outline" size="md" asChild className="hidden sm:inline-flex">
                 <Link href="/auth/login">Log in</Link>
               </Button>
-              <Button size="sm" asChild>
-                <Link href="/auth/register">Get started</Link>
+              <Button size="md" asChild className="hidden sm:inline-flex">
+                <Link href="/services">Book a service</Link>
               </Button>
-            </div>
+            </>
           )}
 
           <Sheet>
             <SheetTrigger asChild>
               <Button
-                variant="ghost"
-                size="icon"
-                className="md:hidden"
+                variant="outline"
+                size="icon-md"
+                className="lg:hidden"
                 aria-label="Open navigation"
               >
                 <MenuIcon />
               </Button>
             </SheetTrigger>
 
-            <SheetContent side="right" className="w-72">
+            <SheetContent side="right" className="w-[300px]">
               <SheetHeader>
                 <SheetTitle>
                   <Logo />
@@ -75,7 +89,7 @@ export async function Navbar() {
               <div className="grid gap-1 px-4">
                 {NAV_LINKS.map((link) => (
                   <Button
-                    key={link.href}
+                    key={link.label}
                     variant="ghost"
                     className="justify-start"
                     asChild
@@ -87,10 +101,15 @@ export async function Navbar() {
                 {!user && (
                   <>
                     <Button variant="ghost" className="justify-start" asChild>
+                      <Link href="/auth/register?role=TECHNICIAN">
+                        Become a technician
+                      </Link>
+                    </Button>
+                    <Button variant="outline" className="mt-2" asChild>
                       <Link href="/auth/login">Log in</Link>
                     </Button>
-                    <Button className="mt-1 justify-start" asChild>
-                      <Link href="/auth/register">Get started</Link>
+                    <Button asChild>
+                      <Link href="/services">Book a service</Link>
                     </Button>
                   </>
                 )}
