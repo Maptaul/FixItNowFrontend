@@ -104,6 +104,7 @@ export default async function TechnicianDashboardPage() {
         </div>
 
         <BookingsTable
+          showTabs={false}
           bookings={pending.length > 0 ? pending : bookings.slice(0, 5)}
           variant="technician"
           emptyTitle="No jobs yet"

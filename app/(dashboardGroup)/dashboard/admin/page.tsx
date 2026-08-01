@@ -95,6 +95,7 @@ export default async function AdminDashboardPage() {
         </div>
 
         <BookingsTable
+          showTabs={false}
           bookings={bookings.slice(0, 8)}
           variant="admin"
           emptyTitle="No bookings on the platform yet"

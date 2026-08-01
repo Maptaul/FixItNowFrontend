@@ -1,47 +1,54 @@
 "use client";
 
-import { SearchIcon, ShieldBanIcon, ShieldCheckIcon, UsersIcon } from "lucide-react";
+import { ShieldBanIcon, ShieldCheckIcon, UsersIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
 import { toast } from "sonner";
+import {
+  DataTableBulkBar,
+  DataTableCard,
+  DataTableCell,
+  DataTableFilterBar,
+  DataTableFilterButton,
+  DataTableHead,
+  DataTablePagination,
+  DataTableRow,
+  DataTableTh,
+} from "@/components/design/data-table";
+import { GradientAvatar } from "@/components/design/gradient-avatar";
+import { Mono } from "@/components/design/money";
 import { EmptyState } from "@/components/shared/empty-state";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Checkbox } from "@/components/ui/checkbox";
 import { formatDate } from "@/lib/format";
-import { IRole, IUser } from "@/lib/types";
+import { IActiveStatus, IRole, IUser } from "@/lib/types";
 import { updateUserStatus } from "../_actions/adminActions";
-
-const ROLE_FILTERS: { value: IRole | "ALL"; label: string }[] = [
-  { value: "ALL", label: "All roles" },
-  { value: "CUSTOMER", label: "Customers" },
-  { value: "TECHNICIAN", label: "Technicians" },
-  { value: "ADMIN", label: "Admins" },
-];
 
 const PER_PAGE = 10;
 
+const ROLE_CYCLE: (IRole | "ALL")[] = [
+  "ALL",
+  "CUSTOMER",
+  "TECHNICIAN",
+  "ADMIN",
+];
+
+const STATUS_CYCLE: (IActiveStatus | "ALL")[] = ["ALL", "ACTIVE", "BLOCKED"];
+
+/** ALL → "All", TECHNICIAN → "Technician". */
+const label = (value: string) =>
+  value.charAt(0) + value.slice(1).toLowerCase();
+
 /**
- * Admin user directory.
+ * Admin user directory — design handoff § Data table, including the
+ * conditional bulk-action bar.
  *
- * The API hands back the full list, so search, role filtering and paging all
- * happen here — instant, and no round-trip per keystroke. Ban/unban is the
- * one thing that goes back to the server.
+ * The API returns the whole directory in one call, so search, filtering and
+ * paging all happen here. Ban/unban is the only thing that goes back to the
+ * server; bulk simply fans the same call out across the selection, because
+ * the API has no bulk endpoint and inventing one client-side would hide
+ * partial failures.
  */
 export function UsersTable({
   users,
@@ -52,182 +59,266 @@ export function UsersTable({
 }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+
   const [search, setSearch] = useState("");
   const [role, setRole] = useState<IRole | "ALL">("ALL");
+  const [status, setStatus] = useState<IActiveStatus | "ALL">("ALL");
   const [page, setPage] = useState(1);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
 
   const filtered = useMemo(() => {
     const query = search.trim().toLowerCase();
 
     return users.filter((user) => {
-      const matchesRole = role === "ALL" || user.role === role;
-      const matchesQuery =
-        !query ||
-        user.name.toLowerCase().includes(query) ||
-        user.email.toLowerCase().includes(query);
+      if (role !== "ALL" && user.role !== role) return false;
+      if (status !== "ALL" && user.activeStatus !== status) return false;
+      if (!query) return true;
 
-      return matchesRole && matchesQuery;
+      return (
+        user.name.toLowerCase().includes(query) ||
+        user.email.toLowerCase().includes(query)
+      );
     });
-  }, [users, search, role]);
+  }, [users, search, role, status]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
   const safePage = Math.min(page, totalPages);
-  const visible = filtered.slice((safePage - 1) * PER_PAGE, safePage * PER_PAGE);
+  const visible = filtered.slice(
+    (safePage - 1) * PER_PAGE,
+    safePage * PER_PAGE,
+  );
 
-  const toggleBan = (user: IUser) => {
-    const nextStatus = user.activeStatus === "BLOCKED" ? "ACTIVE" : "BLOCKED";
+  const selectableOnPage = visible.filter((user) => user.id !== currentUserId);
+  const allOnPageSelected =
+    selectableOnPage.length > 0 &&
+    selectableOnPage.every((user) => selected.has(user.id));
 
-    startTransition(async () => {
-      const result = await updateUserStatus(user.id, nextStatus);
+  const toggleOne = (id: string) => {
+    setSelected((current) => {
+      const next = new Set(current);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
 
-      if (result?.success) {
-        toast.success(result.message);
-        router.refresh();
+  const toggleAllOnPage = () => {
+    setSelected((current) => {
+      const next = new Set(current);
+      if (allOnPageSelected) {
+        selectableOnPage.forEach((user) => next.delete(user.id));
       } else {
-        toast.error(result?.message ?? "Could not update this user.");
+        selectableOnPage.forEach((user) => next.add(user.id));
       }
+      return next;
+    });
+  };
+
+  const applyStatus = (nextStatus: IActiveStatus, ids: string[]) => {
+    startTransition(async () => {
+      const results = await Promise.all(
+        ids.map((id) => updateUserStatus(id, nextStatus)),
+      );
+
+      const failed = results.filter((result) => !result?.success).length;
+
+      if (failed === 0) {
+        toast.success(
+          ids.length === 1
+            ? (results[0]?.message ?? "User updated.")
+            : `${ids.length} users updated.`,
+        );
+      } else {
+        toast.error(
+          `${failed} of ${ids.length} could not be updated — the rest went through.`,
+        );
+      }
+
+      setSelected(new Set());
+      router.refresh();
     });
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-col gap-3 sm:flex-row">
-        <div className="relative flex-1">
-          <SearchIcon className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            type="search"
-            placeholder="Search by name or email…"
-            aria-label="Search users"
-            value={search}
-            onChange={(event) => {
-              setSearch(event.target.value);
-              setPage(1);
-            }}
-            className="pl-9"
-          />
-        </div>
-
-        <Select
-          value={role}
-          onValueChange={(value) => {
-            setRole(value as IRole | "ALL");
+    <DataTableCard template="auto 1.6fr .8fr .7fr .9fr auto">
+      <DataTableFilterBar
+        search={search}
+        onSearchChange={(value) => {
+          setSearch(value);
+          setPage(1);
+        }}
+        searchPlaceholder="Search by name or email…"
+      >
+        <DataTableFilterButton
+          label="Role"
+          value={label(role)}
+          isApplied={role !== "ALL"}
+          onClear={() => {
+            setRole("ALL");
             setPage(1);
           }}
+          onClick={() => {
+            const index = ROLE_CYCLE.indexOf(role);
+            setRole(ROLE_CYCLE[(index + 1) % ROLE_CYCLE.length]);
+            setPage(1);
+          }}
+        />
+
+        <DataTableFilterButton
+          label="Status"
+          value={label(status)}
+          isApplied={status !== "ALL"}
+          onClear={() => {
+            setStatus("ALL");
+            setPage(1);
+          }}
+          onClick={() => {
+            const index = STATUS_CYCLE.indexOf(status);
+            setStatus(STATUS_CYCLE[(index + 1) % STATUS_CYCLE.length]);
+            setPage(1);
+          }}
+        />
+      </DataTableFilterBar>
+
+      <DataTableBulkBar count={selected.size}>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          disabled={isPending}
+          onClick={() => applyStatus("ACTIVE", [...selected])}
         >
-          <SelectTrigger className="sm:w-44" aria-label="Filter by role">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {ROLE_FILTERS.map((filter) => (
-              <SelectItem key={filter.value} value={filter.value}>
-                {filter.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+          Reinstate
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          disabled={isPending}
+          className="text-red hover:text-red"
+          onClick={() => applyStatus("BLOCKED", [...selected])}
+        >
+          Ban users
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => setSelected(new Set())}
+        >
+          Clear
+        </Button>
+      </DataTableBulkBar>
+
+      <DataTableHead>
+        <DataTableTh>
+          <Checkbox
+            checked={allOnPageSelected}
+            onCheckedChange={toggleAllOnPage}
+            aria-label="Select all users on this page"
+          />
+        </DataTableTh>
+        <DataTableTh>User</DataTableTh>
+        <DataTableTh>Role</DataTableTh>
+        <DataTableTh>Status</DataTableTh>
+        <DataTableTh>Joined</DataTableTh>
+        <DataTableTh className="text-right">Actions</DataTableTh>
+      </DataTableHead>
 
       {visible.length === 0 ? (
-        <EmptyState
-          icon={UsersIcon}
-          title="No users match"
-          description="Try a different search term or clear the role filter."
-        />
+        <div className="border-t border-line p-6">
+          <EmptyState
+            icon={UsersIcon}
+            title="No users match"
+            description="Nothing fits that combination. Clearing the role or status filter usually brings the list back."
+          />
+        </div>
       ) : (
-        <>
-          <div className="rounded-xl border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Role</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Joined</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
+        visible.map((user) => {
+          const isBlocked = user.activeStatus === "BLOCKED";
+          const isSelf = user.id === currentUserId;
 
-              <TableBody>
-                {visible.map((user) => {
-                  const isBlocked = user.activeStatus === "BLOCKED";
-                  const isSelf = user.id === currentUserId;
+          return (
+            <DataTableRow key={user.id}>
+              <DataTableCell>
+                <Checkbox
+                  checked={selected.has(user.id)}
+                  disabled={isSelf}
+                  onCheckedChange={() => toggleOne(user.id)}
+                  aria-label={`Select ${user.name}`}
+                />
+              </DataTableCell>
 
-                  return (
-                    <TableRow key={user.id}>
-                      <TableCell className="font-medium">{user.name}</TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {user.email}
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="secondary">{user.role}</Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge
-                          variant="outline"
-                          className={
-                            isBlocked
-                              ? "border-red-500/30 bg-red-500/12 text-red-700 dark:text-red-300"
-                              : "border-green-500/30 bg-green-500/12 text-green-700 dark:text-green-300"
-                          }
-                        >
-                          {isBlocked ? "Banned" : "Active"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {formatDate(user.createdAt)}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        {isSelf ? (
-                          <span className="text-xs text-muted-foreground">
-                            That&apos;s you
-                          </span>
-                        ) : (
-                          <Button
-                            size="sm"
-                            variant={isBlocked ? "outline" : "destructive"}
-                            disabled={isPending}
-                            onClick={() => toggleBan(user)}
-                          >
-                            {isBlocked ? <ShieldCheckIcon /> : <ShieldBanIcon />}
-                            {isBlocked ? "Unban" : "Ban"}
-                          </Button>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          </div>
+              <DataTableCell label="User">
+                <span className="flex min-w-0 items-center gap-2.5">
+                  <GradientAvatar
+                    name={user.name}
+                    kind={
+                      user.role === "ADMIN"
+                        ? "admin"
+                        : user.role === "TECHNICIAN"
+                          ? "technician"
+                          : "customer"
+                    }
+                    size={32}
+                    radius={999}
+                  />
+                  <span className="min-w-0">
+                    <span className="block truncate font-semibold text-text">
+                      {user.name}
+                    </span>
+                    <span className="block truncate text-[12px] text-text3">
+                      {user.email}
+                    </span>
+                  </span>
+                </span>
+              </DataTableCell>
 
-          <div className="flex items-center justify-between">
-            <p className="text-sm text-muted-foreground">
-              {filtered.length} user{filtered.length === 1 ? "" : "s"} · page{" "}
-              {safePage} of {totalPages}
-            </p>
+              <DataTableCell label="Role">
+                <Badge variant="neutral">{user.role}</Badge>
+              </DataTableCell>
 
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={safePage === 1}
-                onClick={() => setPage(safePage - 1)}
-              >
-                Previous
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={safePage === totalPages}
-                onClick={() => setPage(safePage + 1)}
-              >
-                Next
-              </Button>
-            </div>
-          </div>
-        </>
+              <DataTableCell label="Status">
+                <Badge variant={isBlocked ? "red" : "emerald"}>
+                  {isBlocked ? "Banned" : "Active"}
+                </Badge>
+              </DataTableCell>
+
+              <DataTableCell label="Joined">
+                <Mono className="text-[12.5px] text-text2">
+                  {formatDate(user.createdAt)}
+                </Mono>
+              </DataTableCell>
+
+              <DataTableCell className="md:text-right">
+                {isSelf ? (
+                  <span className="text-[12px] text-text3">That&apos;s you</span>
+                ) : (
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant={isBlocked ? "outline" : "destructive-soft"}
+                    disabled={isPending}
+                    onClick={() =>
+                      applyStatus(isBlocked ? "ACTIVE" : "BLOCKED", [user.id])
+                    }
+                  >
+                    {isBlocked ? <ShieldCheckIcon /> : <ShieldBanIcon />}
+                    {isBlocked ? "Unban" : "Ban"}
+                  </Button>
+                )}
+              </DataTableCell>
+            </DataTableRow>
+          );
+        })
       )}
-    </div>
+
+      <DataTablePagination
+        page={safePage}
+        pageSize={PER_PAGE}
+        total={filtered.length}
+        onPageChange={setPage}
+      />
+    </DataTableCard>
   );
 }
