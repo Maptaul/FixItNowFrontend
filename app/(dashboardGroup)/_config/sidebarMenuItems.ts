@@ -8,6 +8,7 @@ import {
   StarIcon,
   UserIcon,
   UsersIcon,
+  WalletIcon,
   WrenchIcon,
 } from "lucide-react";
 import { IRole, ISidebarItem } from "@/lib/types";
@@ -54,6 +55,11 @@ const technicianSidebarItems: ISidebarItem[] = [
     label: "Availability",
     href: "/dashboard/technician/availability",
     icon: CalendarClockIcon,
+  },
+  {
+    label: "Earnings",
+    href: "/dashboard/technician/earnings",
+    icon: WalletIcon,
   },
   {
     label: "My profile",

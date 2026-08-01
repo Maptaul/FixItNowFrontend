@@ -66,6 +66,65 @@ export function earningsByDay(
   return { bars, total };
 }
 
+/**
+ * Money and job count per calendar month over the trailing `months` window.
+ *
+ * Same caveat as the daily version: a booking counts in the month it was last
+ * updated, because the API has no `completedAt`.
+ */
+export function earningsByMonth(
+  bookings: IBooking[],
+  months = 7,
+  statuses: IBookingStatus[] = ["COMPLETED"],
+): { money: Bar[]; jobs: Bar[]; total: number } {
+  const now = new Date();
+  const window: { year: number; month: number }[] = [];
+
+  for (let offset = months - 1; offset >= 0; offset -= 1) {
+    const date = new Date(now.getFullYear(), now.getMonth() - offset, 1);
+    window.push({ year: date.getFullYear(), month: date.getMonth() });
+  }
+
+  const key = (year: number, month: number) => `${year}-${month}`;
+
+  const money = new Map(window.map((m) => [key(m.year, m.month), 0]));
+  const counts = new Map(window.map((m) => [key(m.year, m.month), 0]));
+
+  for (const booking of bookings) {
+    if (!statuses.includes(booking.status)) continue;
+
+    const when = new Date(booking.updatedAt);
+    const bucket = key(when.getFullYear(), when.getMonth());
+
+    if (!money.has(bucket)) continue;
+    money.set(bucket, money.get(bucket)! + toNumber(booking.totalAmount));
+    counts.set(bucket, counts.get(bucket)! + 1);
+  }
+
+  const label = (year: number, month: number) =>
+    new Date(year, month, 1).toLocaleDateString("en-US", { month: "short" });
+
+  return {
+    money: window.map((m) => {
+      const value = money.get(key(m.year, m.month)) ?? 0;
+      return {
+        label: label(m.year, m.month),
+        value,
+        display: value === 0 ? "—" : formatCurrency(value),
+      };
+    }),
+    jobs: window.map((m) => {
+      const value = counts.get(key(m.year, m.month)) ?? 0;
+      return {
+        label: label(m.year, m.month),
+        value,
+        display: value === 0 ? "—" : String(value),
+      };
+    }),
+    total: [...money.values()].reduce((sum, value) => sum + value, 0),
+  };
+}
+
 /** How the platform's bookings are distributed across the lifecycle. */
 export function bookingsByStatus(bookings: IBooking[]): Bar[] {
   const order: IBookingStatus[] = [
