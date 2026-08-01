@@ -75,6 +75,10 @@ Runs on `http://localhost:3000`.
 - Technician profiles with bio, services, reviews and a live availability
   picker
 - Skeleton loaders while sections stream in; graceful 404 and error pages
+- **How it works** — the booking lifecycle explained with the same status
+  badges the dashboards use
+- **Pricing** — entry prices per category, read live from the services API,
+  plus what the platform does and doesn't charge for
 
 ### Customer
 - Register / log in with inline validation
@@ -84,6 +88,7 @@ Runs on `http://localhost:3000`.
 - Track bookings with status badges, cancel before work starts, review after
   completion
 - Payment history with transaction references
+- Help centre with FAQs and routing into the right screen for each problem
 
 ### Technician
 - Dashboard with pending requests, jobs in flight, earnings and rating
@@ -92,16 +97,23 @@ Runs on `http://localhost:3000`.
 - Availability scheduler — add and remove working blocks, with already-booked
   slots locked
 - Accept / decline requests, then start and complete jobs
+- Earnings ledger with paid / pending split and a month-by-month breakdown
+- Analytics: jobs per week, revenue by service, busiest hours and status mix,
+  all derived from the job history the API already returns
+- Reviews inbox with a rating histogram
 
 ### Admin
 - Platform overview: users, technicians, bookings, revenue, categories
 - User directory with search, role filter, pagination and ban/unban
 - Service category management
 - Read-only view of every booking on the platform
+- Every payment on the platform, filterable by status, with revenue totals
 
 ### Throughout
 - Role-based UI — each role gets its own sidebar and dashboard, not one menu
   with items hidden
+- **⌘K search** across everything the signed-in role may read — its own
+  bookings, plus every service and technician; admins also get users
 - Route protection in `proxy.ts` (Next 16's middleware)
 - Dark mode
 - Every failure shows something: inline field errors, toasts, empty states,
@@ -113,7 +125,8 @@ Runs on `http://localhost:3000`.
 
 ```
 app/
-  (publicGroup)/       home, /services, /technicians, /technicians/[id]
+  (publicGroup)/       home, /services, /technicians, /technicians/[id],
+                       /how-it-works, /pricing
     _actions/          server-side reads
     _components/       group-local components
   (authGroup)/         /auth/login, /auth/register
@@ -127,7 +140,10 @@ app/
 components/
   ui/                  shadcn primitives
   shared/              navbar, footer, form, badges, rating, empty state
-lib/                   api client, types, constants, formatters, zod schemas
+  design/              handoff-specific pieces: charts, stepper, timeline,
+                       data table, month grid, rating histogram
+lib/                   api client, types, constants, formatters, zod schemas,
+                       analytics (all derived client-side), booking timeline
 service/               getMe, logout
 utils/                 jwt helpers
 proxy.ts               route protection

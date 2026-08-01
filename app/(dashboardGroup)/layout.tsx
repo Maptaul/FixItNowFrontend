@@ -25,9 +25,10 @@ import { getMe } from "@/service/getMe";
  * to pick the sidebar, and it's the last line of defence if the proxy is ever
  * bypassed.
  *
- * Not built: the handoff's ⌘K search affordance and notification drawer. The
- * API has no search or notification endpoints, and a control that does
- * nothing is worse than no control.
+ * Not built: the handoff's notification drawer. The API has no notification
+ * endpoint, and a control that does nothing is worse than no control. The ⌘K
+ * affordance next to it *is* built — see `CommandPalette`, which fans out
+ * across the endpoints each role can already read.
  */
 export default async function DashboardLayout({
   children,

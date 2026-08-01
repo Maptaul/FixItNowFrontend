@@ -103,7 +103,7 @@ query string, so results are shareable and server-rendered.
 |---|---|---|
 | `POST /api/payments/create` | `startCheckout` — [`paymentActions.ts`](<app/(dashboardGroup)/_actions/paymentActions.ts>) | `StripeCheckoutButton` → redirects to Stripe Checkout |
 | `POST /api/payments/confirm` | `confirmPayment` — same file | `/payment/success` |
-| `GET /api/payments` | `getMyPayments` — same file | `/dashboard/customer/payments`, customer overview |
+| `GET /api/payments` | `getMyPayments` — same file | `/dashboard/customer/payments`, customer overview, and `/dashboard/admin/payments` — the same endpoint returns **every** payment when the caller is an admin |
 
 ### Customer — reviews
 
@@ -146,17 +146,38 @@ The bulk bar has no bulk endpoint behind it: it fans `PATCH
 /api/admin/users/:id` across the selection and reports the split if some
 fail, rather than pretending the whole batch succeeded.
 
+### Dashboard search (⌘K)
+
+There is no global search endpoint. `dashboardSearch` —
+[`searchActions.ts`](<app/(dashboardGroup)/_actions/searchActions.ts>) — fans
+out across the resources the signed-in role may already read and merges the
+results, so the palette can never surface data the role couldn't reach on its
+own dashboard.
+
+| Role | Searches |
+|---|---|
+| everyone | `GET /api/services?search=` (the API filters server-side), `GET /api/technicians` |
+| customer | `GET /api/bookings` |
+| technician | `GET /api/technician/bookings` |
+| admin | `GET /api/admin/bookings`, `GET /api/admin/users` |
+
+Results are ordered Bookings → Services → Technicians → Users. Each query
+carries a sequence number and only the newest one may write results — without
+it a slow earlier query lands after a faster later one and overwrites it.
+
 ---
 
 ## Route → endpoint summary
 
-All 27 routes, checked against `app/**/page.tsx`.
+All 33 routes, checked against `app/**/page.tsx`.
 
 | Route | Endpoints |
 |---|---|
 | `/` | `GET /api/services`, `GET /api/technicians`, `GET /api/categories` |
 | `/services` | `GET /api/services`, `GET /api/categories` |
 | `/technicians` | `GET /api/technicians`, `GET /api/categories` |
+| `/how-it-works` | — (static: the lifecycle explained with the real status badges) |
+| `/pricing` | `GET /api/services`, `GET /api/categories` (live entry prices per category) |
 | `/technicians/[id]` | `GET /api/technicians/:id`, `GET /api/auth/me` |
 | `/book/[technicianId]` | `GET /api/technicians/:id`, `GET /api/auth/me`, `POST /api/bookings` |
 | `/auth/register` | `POST /api/auth/register` |
@@ -168,6 +189,7 @@ All 27 routes, checked against `app/**/page.tsx`.
 | `/dashboard/customer/payments` | `GET /api/payments` |
 | `/dashboard/customer/reviews` | `GET /api/bookings`, `POST /api/reviews` |
 | `/dashboard/customer/profile` | `GET /api/auth/me`, `PUT /api/auth/my-profile` |
+| `/dashboard/customer/support` | — (static help centre: routing cards + FAQ) |
 | `/payment/success` | `POST /api/payments/confirm` |
 | `/payment/cancel` | — (static outcome page) |
 | `/dashboard/technician` | `GET /api/auth/me`, `GET /api/technician/bookings` |
@@ -175,11 +197,14 @@ All 27 routes, checked against `app/**/page.tsx`.
 | `/dashboard/technician/services` | `GET /api/technicians/:id`, `GET /api/categories`, `POST`/`PUT`/`DELETE /api/technician/services` |
 | `/dashboard/technician/availability` | `GET`/`PUT /api/technician/availability` |
 | `/dashboard/technician/earnings` | `GET /api/technician/bookings` |
+| `/dashboard/technician/analytics` | `GET /api/technician/bookings` |
+| `/dashboard/technician/reviews` | `GET /api/auth/me`, `GET /api/technicians/:id` |
 | `/dashboard/technician/profile` | `GET /api/auth/me`, `GET /api/technicians/:id`, `GET /api/technician/availability`, `PUT /api/technician/profile`, `PUT /api/auth/my-profile` |
 | `/dashboard/admin` | `GET /api/admin/users`, `GET /api/admin/bookings`, `GET /api/admin/categories` |
 | `/dashboard/admin/users` | `GET /api/admin/users`, `PATCH /api/admin/users/:id` |
 | `/dashboard/admin/bookings` | `GET /api/admin/bookings` |
 | `/dashboard/admin/categories` | `GET /api/admin/categories`, `GET /api/services`, `GET /api/admin/bookings`, `POST`/`PUT`/`DELETE /api/admin/categories` |
+| `/dashboard/admin/payments` | `GET /api/payments` (returns every payment for an admin) |
 | `/dashboard/admin/profile` | `GET /api/auth/me`, `PUT /api/auth/my-profile` |
 
 ---
