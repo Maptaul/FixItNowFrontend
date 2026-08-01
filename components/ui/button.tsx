@@ -1,45 +1,65 @@
-import * as React from "react"
-import { cva, type VariantProps } from "class-variance-authority"
-import { Slot } from "radix-ui"
+import * as React from "react";
+import { cva, type VariantProps } from "class-variance-authority";
+import { Slot } from "radix-ui";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
+/*
+ * Button — design_handoff_fixitnow/README.md § Buttons.
+ *
+ * Six variants, one primary action per view. Heights are the handoff's
+ * ladder: l:44 / default:42 / m:38 / s:32, all r10, 13.5px/600.
+ * Hover is 120ms ease-out; focus uses the 1px primary border + soft halo
+ * from :focus-visible in globals.css.
+ */
 const buttonVariants = cva(
-  "group/button inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  "group/button inline-flex shrink-0 items-center justify-center gap-2 rounded-md border bg-clip-padding font-semibold whitespace-nowrap transition-colors duration-120 ease-out outline-none select-none active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:cursor-not-allowed disabled:border-line disabled:bg-surface2 disabled:text-text3 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/80",
+        // Primary — the one action per view.
+        default:
+          "border-primary bg-primary text-primary-foreground shadow-sh1 hover:border-primary-hover hover:bg-primary-hover",
+        // Secondary — the handoff's outlined button on a surface fill.
         outline:
-          "border-border bg-background hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50",
+          "border-line-strong bg-surface text-text hover:bg-surface2 aria-expanded:bg-surface2",
+        // Soft — active filter pills, low-emphasis affirmative actions.
+        soft: "border-primary-border bg-primary-soft text-primary hover:brightness-[0.98]",
+        // Neutral fill, kept for shadcn components that ask for it.
         secondary:
-          "bg-secondary text-secondary-foreground hover:bg-[color-mix(in_oklch,var(--secondary),var(--foreground)_5%)] aria-expanded:bg-secondary aria-expanded:text-secondary-foreground",
+          "border-transparent bg-surface2 text-text hover:bg-surface3 aria-expanded:bg-surface2",
         ghost:
-          "hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50",
+          "border-transparent text-text2 hover:bg-surface2 hover:text-text aria-expanded:bg-surface2 aria-expanded:text-text",
+        // Destructive — solid red. Reserve for irreversible confirmations.
         destructive:
-          "bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40",
-        link: "text-primary underline-offset-4 hover:underline",
+          "border-red bg-red text-white shadow-sh1 hover:brightness-110",
+        // Soft destructive — "Cancel booking", "Reject", "Delete account".
+        "destructive-soft":
+          "border-red-border bg-red-soft text-red hover:brightness-[0.98]",
+        link: "border-transparent text-primary underline-offset-[3px] hover:text-primary-hover hover:underline",
       },
       size: {
-        default:
-          "h-8 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2",
-        xs: "h-6 gap-1 rounded-[min(var(--radius-md),10px)] px-2 text-xs in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3",
-        sm: "h-7 gap-1 rounded-[min(var(--radius-md),12px)] px-2.5 text-[0.8rem] in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3.5",
-        lg: "h-9 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2",
-        icon: "size-8",
-        "icon-xs":
-          "size-6 rounded-[min(var(--radius-md),10px)] in-data-[slot=button-group]:rounded-lg [&_svg:not([class*='size-'])]:size-3",
+        default: "h-[42px] px-5 text-btn",
+        lg: "h-11 px-5 text-[14px]",
+        md: "h-[38px] px-4 text-btn",
+        sm: "h-8 gap-1.5 rounded-[9px] px-3 text-[13px] [&_svg:not([class*='size-'])]:size-3.5",
+        xs: "h-7 gap-1 rounded-sm px-2.5 text-[12.5px] [&_svg:not([class*='size-'])]:size-3",
+        // Icon buttons are square at the row height.
+        icon: "size-[42px] px-0",
+        "icon-lg": "size-11 px-0",
+        "icon-md": "size-[38px] px-0",
         "icon-sm":
-          "size-7 rounded-[min(var(--radius-md),12px)] in-data-[slot=button-group]:rounded-lg",
-        "icon-lg": "size-9",
+          "size-8 rounded-[9px] px-0 [&_svg:not([class*='size-'])]:size-3.5",
+        "icon-xs":
+          "size-7 rounded-sm px-0 [&_svg:not([class*='size-'])]:size-3",
       },
     },
     defaultVariants: {
       variant: "default",
       size: "default",
     },
-  }
-)
+  },
+);
 
 function Button({
   className,
@@ -49,9 +69,9 @@ function Button({
   ...props
 }: React.ComponentProps<"button"> &
   VariantProps<typeof buttonVariants> & {
-    asChild?: boolean
+    asChild?: boolean;
   }) {
-  const Comp = asChild ? Slot.Root : "button"
+  const Comp = asChild ? Slot.Root : "button";
 
   return (
     <Comp
@@ -61,7 +81,7 @@ function Button({
       className={cn(buttonVariants({ variant, size, className }))}
       {...props}
     />
-  )
+  );
 }
 
-export { Button, buttonVariants }
+export { Button, buttonVariants };

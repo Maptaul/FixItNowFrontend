@@ -1,40 +1,59 @@
-import * as React from "react"
-import { cva, type VariantProps } from "class-variance-authority"
-import { Slot } from "radix-ui"
+import * as React from "react";
+import { cva, type VariantProps } from "class-variance-authority";
+import { Slot } from "radix-ui";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
+/*
+ * Chip / status badge — design_handoff_fixitnow/README.md § Chips.
+ *
+ * 11.5px / 700 / 3px 9px / r999 / 1px border, never wrapping. The semantic
+ * mapping is fixed across the whole product, so pick the variant by *meaning*
+ * rather than by colour:
+ *
+ *   emerald  Completed · Paid · Verified · Settled · Cleared · Live · Sent
+ *   amber    Pending · Request · Clearing · Expiring · Low supply · Disputed
+ *   primary  In progress · On the way · Accepted · Next
+ *   red      Cancelled · Refunded · Failed · Banned · Removed
+ *   violet   Emergency tier (no border)
+ *   neutral  Draft · Fully booked · anything without state
+ *
+ * Status is never colour-only — every chip carries a word.
+ */
 const badgeVariants = cva(
-  "group/badge inline-flex h-5 w-fit shrink-0 items-center justify-center gap-1 overflow-hidden rounded-4xl border border-transparent px-2 py-0.5 text-xs font-medium whitespace-nowrap transition-all focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&>svg]:pointer-events-none [&>svg]:size-3!",
+  "inline-flex w-fit shrink-0 items-center justify-center gap-1 rounded-full border px-[9px] py-[3px] text-chip whitespace-nowrap [&>svg]:pointer-events-none [&>svg]:size-3",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground [a]:hover:bg-primary/80",
-        secondary:
-          "bg-secondary text-secondary-foreground [a]:hover:bg-secondary/80",
-        destructive:
-          "bg-destructive/10 text-destructive focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:focus-visible:ring-destructive/40 [a]:hover:bg-destructive/20",
-        outline:
-          "border-border text-foreground [a]:hover:bg-muted [a]:hover:text-muted-foreground",
-        ghost:
-          "hover:bg-muted hover:text-muted-foreground dark:hover:bg-muted/50",
-        link: "text-primary underline-offset-4 hover:underline",
+        emerald: "border-emerald-border bg-emerald-soft text-emerald",
+        amber: "border-amber-border bg-amber-soft text-amber",
+        primary: "border-primary-border bg-primary-soft text-primary",
+        red: "border-red-border bg-red-soft text-red",
+        violet: "border-transparent bg-violet-soft text-violet",
+        neutral: "border-line bg-surface2 text-text2",
+        // Solid fill — the only chip that sits on a coloured surface.
+        solid: "border-primary bg-primary text-primary-foreground",
+        outline: "border-line text-text2",
+        // shadcn aliases, so existing call sites keep working.
+        default: "border-primary-border bg-primary-soft text-primary",
+        secondary: "border-line bg-surface2 text-text2",
+        destructive: "border-red-border bg-red-soft text-red",
       },
     },
     defaultVariants: {
-      variant: "default",
+      variant: "neutral",
     },
-  }
-)
+  },
+);
 
 function Badge({
   className,
-  variant = "default",
+  variant = "neutral",
   asChild = false,
   ...props
 }: React.ComponentProps<"span"> &
   VariantProps<typeof badgeVariants> & { asChild?: boolean }) {
-  const Comp = asChild ? Slot.Root : "span"
+  const Comp = asChild ? Slot.Root : "span";
 
   return (
     <Comp
@@ -43,7 +62,7 @@ function Badge({
       className={cn(badgeVariants({ variant }), className)}
       {...props}
     />
-  )
+  );
 }
 
-export { Badge, badgeVariants }
+export { Badge, badgeVariants };
