@@ -196,24 +196,6 @@ action the API will accept. The API re-checks every one.
 
 ---
 
-## 🤖 Agentic coding
-
-The repo carries its own guidance for AI coding agents:
-
-| Path | What |
-|---|---|
-| `CLAUDE.md` | entry point — the short version |
-| `.agents/AGENTS.md` | full architecture and conventions |
-| `.agents/rules/` | Next.js, API integration, UI |
-| `.agents/skills/` | booking lifecycle, auth and roles |
-| `.agents/templates/` | shapes for pages, server actions, forms |
-| `.agents/workflows/` | add a feature, debug the API, review a diff |
-| `.claude/agents/` | `api-integrator`, `ui-builder`, `frontend-reviewer` |
-| `.claude/commands/` | `/verify`, `/api-map`, `/review-diff`, `/smoke` |
-| `.claude/skills/` | `fixitnow-conventions` |
-
----
-
 ## ✅ Verification
 
 No test runner. The gate is:

@@ -68,6 +68,7 @@ temp/
 .eslintcache
 .parcel-cache/
 
+# Local tooling config — not part of the deliverable
 .agents
 .claude
-.CLAUDE.md
+CLAUDE.md
