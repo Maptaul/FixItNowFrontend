@@ -1,31 +1,23 @@
 import { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getMe } from "@/service/getMe";
-import { AccountForm } from "../../../_components/AccountForm";
 import { PageHeader } from "../../../_components/PageHeader";
+import { ProfileTabs } from "../../../_components/ProfileTabs";
 
-export const metadata: Metadata = { title: "My profile" };
+export const metadata: Metadata = { title: "Profile & settings" };
 
 export default async function CustomerProfilePage() {
   const user = await getMe();
   if (!user) redirect("/auth/login");
 
   return (
-    <div className="max-w-xl">
+    <div className="max-w-2xl">
       <PageHeader
-        title="My profile"
-        description="Update the name technicians see and change your password."
+        title="Profile & settings"
+        description="The name technicians see, and your password."
       />
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Account details</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <AccountForm user={user} />
-        </CardContent>
-      </Card>
+      <ProfileTabs user={user} />
     </div>
   );
 }
