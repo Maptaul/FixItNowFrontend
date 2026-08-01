@@ -12,6 +12,11 @@ import { cn } from "@/lib/utils";
  *
  * The connector is a 2px line: primary above completed steps, --border after.
  * Upcoming labels drop to 500 weight in --text-3.
+ *
+ * Labels are `whitespace-nowrap`, so five steps need ~827px. That is wider
+ * than the 547px column the active-booking panel gives it on a 1280px
+ * desktop, and the overflow used to widen the whole page. The row wraps
+ * instead — 3 + 2 at that width, still one line wherever there is room.
  */
 export type StepState = "done" | "current" | "upcoming";
 
@@ -23,7 +28,7 @@ export function Stepper({
   className?: string;
 }) {
   return (
-    <ol className={cn("flex items-center", className)}>
+    <ol className={cn("flex flex-wrap items-center gap-y-5", className)}>
       {steps.map((step, index) => {
         const isLast = index === steps.length - 1;
 
