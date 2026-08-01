@@ -1,5 +1,7 @@
-import Link from "next/link";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
+import Link from "next/link";
+import logo from "../../public/LogoFinal.png";
 
 /** 32px r10 primary tile + wordmark at 17px/800/-0.03em. */
 export function Logo({
@@ -11,12 +13,13 @@ export function Logo({
 }) {
   return (
     <Link href={href} className={cn("flex items-center gap-2.5", className)}>
-      <span className="grid size-8 place-items-center rounded-md bg-primary text-[15px] font-extrabold text-primary-foreground">
-        F
-      </span>
-      <span className="text-[17px] font-extrabold tracking-[-0.03em] text-text">
-        FixItNow
-      </span>
+      <Image
+        src={logo}
+        alt="FixItNow Logo"
+        width={50}
+        height={50}
+        className="h-10 w-auto rounded-md object-contain"
+      />
     </Link>
   );
 }
