@@ -6,6 +6,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { DashboardSidebar } from "./_components/DashboardSidebar";
 import { DashboardBreadcrumb } from "./_components/DashboardBreadcrumb";
 import { ROLE_LABEL } from "./_config/sidebarMenuItems";
@@ -37,39 +38,44 @@ export default async function DashboardLayout({
   if (!user) redirect("/auth/login");
 
   return (
-    <SidebarProvider
-      style={
-        {
-          "--sidebar-width": "248px",
-          "--sidebar-width-icon": "68px",
-        } as React.CSSProperties
-      }
-    >
-      <DashboardSidebar user={user} />
+    // SidebarMenuButton renders a Tooltip when collapsed, and this build of
+    // the component doesn't bring its own provider — without this the whole
+    // dashboard throws "`Tooltip` must be used within `TooltipProvider`".
+    <TooltipProvider delayDuration={200}>
+      <SidebarProvider
+        style={
+          {
+            "--sidebar-width": "248px",
+            "--sidebar-width-icon": "68px",
+          } as React.CSSProperties
+        }
+      >
+        <DashboardSidebar user={user} />
 
-      <SidebarInset className="bg-bg">
-        <header className="fx-glass sticky top-0 z-30 flex h-[62px] items-center gap-3 border-b border-line px-5">
-          <SidebarTrigger className="md:hidden" />
+        <SidebarInset className="bg-bg">
+          <header className="fx-glass sticky top-0 z-30 flex h-[62px] items-center gap-3 border-b border-line px-5">
+            <SidebarTrigger className="md:hidden" />
 
-          <DashboardBreadcrumb role={ROLE_LABEL[user.role]} />
+            <DashboardBreadcrumb role={ROLE_LABEL[user.role]} />
 
-          <div className="ml-auto flex items-center gap-2">
-            <ThemeToggle />
+            <div className="ml-auto flex items-center gap-2">
+              <ThemeToggle />
 
-            <span className="hidden sm:block">
-              <UserMenu user={user} variant="pill" />
-            </span>
-            <span className="sm:hidden">
-              <UserMenu user={user} />
-            </span>
+              <span className="hidden sm:block">
+                <UserMenu user={user} variant="pill" />
+              </span>
+              <span className="sm:hidden">
+                <UserMenu user={user} />
+              </span>
+            </div>
+          </header>
+
+          {/* Dashboard content area: 28px 26px 64px, per the handoff. */}
+          <div className="flex-1 px-4 pt-6 pb-16 sm:px-[26px] sm:pt-7">
+            {children}
           </div>
-        </header>
-
-        {/* Dashboard content area: 28px 26px 64px, per the handoff. */}
-        <div className="flex-1 px-4 pt-6 pb-16 sm:px-[26px] sm:pt-7">
-          {children}
-        </div>
-      </SidebarInset>
-    </SidebarProvider>
+        </SidebarInset>
+      </SidebarProvider>
+    </TooltipProvider>
   );
 }
