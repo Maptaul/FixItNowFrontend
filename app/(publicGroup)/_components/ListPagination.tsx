@@ -38,9 +38,16 @@ export function ListPagination({ meta }: { meta: IMeta }) {
     <Pagination className="mt-8">
       <PaginationContent>
         <PaginationItem>
+          {/*
+           * At a boundary the arrow points back at the current page rather
+           * than page 0 / totalPages + 1. It's already unclickable, but a
+           * middle-click or a CSS failure shouldn't produce a URL that
+           * doesn't exist.
+           */}
           <PaginationPrevious
-            href={hrefFor(current - 1)}
+            href={hrefFor(Math.max(1, current - 1))}
             aria-disabled={current === 1}
+            tabIndex={current === 1 ? -1 : undefined}
             className={current === 1 ? "pointer-events-none opacity-50" : ""}
           />
         </PaginationItem>
@@ -55,8 +62,9 @@ export function ListPagination({ meta }: { meta: IMeta }) {
 
         <PaginationItem>
           <PaginationNext
-            href={hrefFor(current + 1)}
+            href={hrefFor(Math.min(totalPages, current + 1))}
             aria-disabled={current === totalPages}
+            tabIndex={current === totalPages ? -1 : undefined}
             className={
               current === totalPages ? "pointer-events-none opacity-50" : ""
             }

@@ -90,7 +90,15 @@ export const TRANSITION_LABEL: Record<string, string> = {
 
 export const RATING_OPTIONS = [5, 4, 3, 2, 1] as const;
 
+/** Card grids are 3-up, so nine fills exactly three rows. */
 export const PAGE_SIZE = 9;
+
+/**
+ * Full-width list rows (the technician search results) are much taller than a
+ * card, so nine of them is a long scroll. Six keeps the page a comfortable
+ * length and means the pager actually appears at realistic result counts.
+ */
+export const ROW_PAGE_SIZE = 6;
 
 /*
  * Cover photography per service category (Unsplash, free to use).

@@ -6,7 +6,7 @@ import { Money } from "@/components/design/money";
 import { EmptyState } from "@/components/shared/empty-state";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { PAGE_SIZE } from "@/lib/constants";
+import { ROW_PAGE_SIZE } from "@/lib/constants";
 import { toNumber } from "@/lib/format";
 import { getCategories } from "../_actions/getCategories";
 import { getTechnicians } from "../_actions/getTechnicians";
@@ -28,7 +28,8 @@ const first = (value: string | string[] | undefined): string | undefined =>
 function RowsSkeleton() {
   return (
     <div className="space-y-4">
-      {Array.from({ length: 4 }).map((_, index) => (
+      {/* Match the page size so the list doesn't jump when it resolves. */}
+      {Array.from({ length: ROW_PAGE_SIZE }).map((_, index) => (
         <div
           key={index}
           className="flex gap-5 rounded-card border border-line bg-surface p-5 shadow-sh2"
@@ -64,7 +65,7 @@ async function TechnicianResults({
     location: first(params.location),
     minRating: first(params.minRating),
     page: first(params.page) ?? 1,
-    limit: PAGE_SIZE,
+    limit: ROW_PAGE_SIZE,
   });
 
   if (technicians.length === 0) {
