@@ -1,75 +1,82 @@
-import { MapPinIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { Rating } from "@/components/shared/rating";
+import { Money } from "@/components/design/money";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { categoryImage } from "@/lib/constants";
-import { formatCurrency } from "@/lib/format";
+import { formatRating } from "@/lib/format";
 import { IService } from "@/lib/types";
 
+/**
+ * Service card — design handoff § Cards › Service card.
+ *
+ * 120px image band, then a 16px body: title with a right-aligned tag chip,
+ * a 12.5px description, and a footer row carrying the mono price with
+ * "/ visit" plus the technician's rating. Whole card is the click target;
+ * hover lifts 2px to --sh3 over 160ms.
+ *
+ * The handoff ships a striped placeholder for the band because it hands over
+ * no assets — real category photography replaces it here, which is what the
+ * placeholder was standing in for.
+ */
 export function ServiceCard({ service }: { service: IService }) {
   const technician = service.technician;
-  const bookHref = technician
+  const href = technician
     ? `/technicians/${technician.id}?service=${service.id}`
     : "/technicians";
 
+  const reviewCount = technician?.reviews?.length ?? 0;
+
   return (
-    <Card className="group overflow-hidden pt-0 transition-shadow hover:shadow-md">
-      <div className="relative aspect-[16/10] overflow-hidden bg-muted">
+    <Link
+      href={href}
+      className="group flex flex-col overflow-hidden rounded-card border border-line bg-surface shadow-sh2 transition-all duration-160 hover:-translate-y-0.5 hover:shadow-sh3"
+    >
+      <div className="fx-placeholder relative h-[120px] shrink-0 overflow-hidden">
         <Image
           src={categoryImage(service.category?.name)}
           alt=""
           fill
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          className="object-cover transition-transform duration-300 group-hover:scale-105"
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+          className="object-cover"
         />
-        {service.category && (
-          <Badge
-            variant="secondary"
-            className="absolute top-3 left-3 backdrop-blur-sm"
-          >
-            {service.category.name}
-          </Badge>
-        )}
       </div>
 
-      <CardContent className="space-y-2">
-        <h3 className="line-clamp-1 font-semibold">{service.title}</h3>
+      <div className="flex flex-1 flex-col p-4">
+        <div className="mb-1.5 flex items-start justify-between gap-2">
+          <h3 className="line-clamp-1 text-cardtitle text-text">
+            {service.title}
+          </h3>
+          {service.category && (
+            <Badge variant="neutral" className="shrink-0">
+              {service.category.name}
+            </Badge>
+          )}
+        </div>
 
-        <p className="line-clamp-2 min-h-10 text-sm text-muted-foreground">
-          {service.description ?? "No description provided for this service."}
+        <p className="line-clamp-2 min-h-[38px] text-caption font-normal text-text2">
+          {service.description ??
+            `Fixed price, agreed before the visit. Booked with ${technician?.user?.name ?? "a verified technician"}.`}
         </p>
 
-        {technician && (
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
-            <span className="text-muted-foreground">
-              by{" "}
-              <span className="font-medium text-foreground">
-                {technician.user?.name ?? "Technician"}
+        <div className="mt-4 flex items-end justify-between gap-2 border-t border-line pt-3.5">
+          <span>
+            <Money value={service.price} className="text-[15px] font-bold" />
+            <span className="ml-1 text-[11.5px] text-text3">/ visit</span>
+          </span>
+
+          {technician && (
+            <span className="text-caption text-text3">
+              <span aria-hidden="true" className="text-star">
+                ★
+              </span>{" "}
+              <span className="font-mono">
+                {formatRating(technician.avgRating)}
               </span>
+              {reviewCount > 0 && ` · ${reviewCount} review${reviewCount === 1 ? "" : "s"}`}
             </span>
-            <Rating value={technician.avgRating} />
-          </div>
-        )}
-
-        {technician?.location && (
-          <p className="flex items-center gap-1 text-sm text-muted-foreground">
-            <MapPinIcon className="size-3.5" />
-            {technician.location}
-          </p>
-        )}
-      </CardContent>
-
-      <CardFooter className="mt-auto items-center justify-between border-t pt-4">
-        <span className="text-lg font-semibold">
-          {formatCurrency(service.price)}
-        </span>
-        <Button size="sm" asChild>
-          <Link href={bookHref}>Book now</Link>
-        </Button>
-      </CardFooter>
-    </Card>
+          )}
+        </div>
+      </div>
+    </Link>
   );
 }

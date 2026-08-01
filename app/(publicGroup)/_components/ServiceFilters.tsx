@@ -87,11 +87,11 @@ export function ServiceFilters({
 
   return (
     <aside
-      className="space-y-5 rounded-xl border p-4 lg:sticky lg:top-20"
+      className="h-fit space-y-5 rounded-panel border border-line bg-surface p-[18px] shadow-sh2 transition-opacity lg:sticky lg:top-[86px] data-pending:opacity-70"
       data-pending={isPending ? "" : undefined}
     >
       <div className="flex items-center justify-between">
-        <h2 className="font-semibold">Filters</h2>
+        <h2 className="text-panel text-text">Filters</h2>
         {hasFilters && (
           <Button
             variant="ghost"
@@ -180,25 +180,29 @@ export function ServiceFilters({
         </div>
       )}
 
-      <div className="grid gap-1.5">
-        <Label htmlFor="minRating">Minimum rating</Label>
-        <Select
-          value={searchParams.get("minRating") ?? ANY}
-          onValueChange={(value) => pushParams({ minRating: value })}
-        >
-          <SelectTrigger id="minRating" className="w-full">
-            <SelectValue placeholder="Any rating" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value={ANY}>Any rating</SelectItem>
-            {[4, 3, 2, 1].map((rating) => (
-              <SelectItem key={rating} value={String(rating)}>
-                {rating}★ &amp; up
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+      {/* Rating as chips — an applied filter uses the soft-primary style. */}
+      <fieldset className="grid gap-2">
+        <legend className="mb-1.5 text-label text-text">Minimum rating</legend>
+
+        <div className="flex flex-wrap gap-1.5">
+          {[ANY, "4", "3", "2"].map((value) => {
+            const isApplied = (searchParams.get("minRating") ?? ANY) === value;
+
+            return (
+              <Button
+                key={value}
+                type="button"
+                variant={isApplied ? "soft" : "outline"}
+                size="xs"
+                aria-pressed={isApplied}
+                onClick={() => pushParams({ minRating: value })}
+              >
+                {value === ANY ? "Any" : `${value}★ & up`}
+              </Button>
+            );
+          })}
+        </div>
+      </fieldset>
     </aside>
   );
 }
