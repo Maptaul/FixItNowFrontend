@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { Logo } from "@/components/shared/logo";
+import Link from "next/link";
 
 /** Footer — 1.4fr brand column + four link columns, per the handoff. */
 const FOOTER_COLUMNS = [
@@ -65,8 +65,7 @@ export function Footer() {
 
       <div className="border-t border-line">
         <p className="mx-auto w-full max-w-[1240px] px-5 py-4 text-caption text-text3 lg:px-10">
-          © {new Date().getFullYear()} FixItNow. Built for Programming Hero
-          Level 2 — Assignment 5.
+          © {new Date().getFullYear()} FixItNow — All rights reserved.
         </p>
       </div>
     </footer>
