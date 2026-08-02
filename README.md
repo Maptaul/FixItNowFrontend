@@ -235,7 +235,7 @@ plus a manual click-through as each role.
 Frontend Repo    : https://github.com/Maptaul/FixItNowFrontend
 Live Frontend    : https://fixit-now-frontend.vercel.app
 Backend API      : https://fixitbackend.vercel.app
-Demo Video       : <your Loom/Drive URL>
+Demo Video       : https://www.loom.com/share/2b4d1586f1ea40268b5d61f872b68004
 Admin Email      : admin@fixitnow.com
 Admin Password   : admin123
 ```

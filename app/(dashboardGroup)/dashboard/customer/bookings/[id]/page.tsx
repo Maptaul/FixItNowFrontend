@@ -8,10 +8,15 @@ import { Timeline } from "@/components/design/timeline";
 import { BookingStatusBadge } from "@/components/shared/status-badge";
 import { Button } from "@/components/ui/button";
 import { buildBookingTimeline } from "@/lib/booking-timeline";
-import { canCancelBooking, canPayBooking } from "@/lib/constants";
+import {
+  canCancelBooking,
+  canPayBooking,
+  isBookingLive,
+} from "@/lib/constants";
 import { formatDateTime, formatRating } from "@/lib/format";
 import { getBookingById } from "../../../../_actions/bookingActions";
 import { CustomerBookingActions } from "../../../../_components/CustomerBookingActions";
+import { LiveRefresh } from "../../../../_components/LiveRefresh";
 
 export const metadata: Metadata = { title: "Booking details" };
 
@@ -46,6 +51,13 @@ const BookingDetailsPage = async ({
 
   return (
     <>
+      {/*
+       * This is the screen a customer sits on while waiting for the
+       * technician to accept, start or finish. Watch until the booking
+       * reaches a status nobody can move it out of.
+       */}
+      <LiveRefresh enabled={isBookingLive(booking.status)} />
+
       <Button variant="ghost" size="sm" className="mb-4 -ml-2" asChild>
         <Link href="/dashboard/customer/bookings">
           <ArrowLeftIcon />

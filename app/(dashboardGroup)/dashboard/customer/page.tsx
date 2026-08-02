@@ -7,6 +7,7 @@ import {
 import { Metadata } from "next";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { isBookingLive } from "@/lib/constants";
 import { formatCurrency, toNumber } from "@/lib/format";
 import { getMe } from "@/service/getMe";
 import { getMyBookings } from "../../_actions/bookingActions";
@@ -16,6 +17,7 @@ import { BookAgainList } from "../../_components/BookAgainList";
 import { BookingsTable } from "../../_components/BookingsTable";
 import { PageHeader } from "../../_components/PageHeader";
 import { StatCard } from "../../_components/StatCard";
+import { LiveRefresh } from "../../_components/LiveRefresh";
 
 export const metadata: Metadata = { title: "Customer dashboard" };
 
@@ -34,9 +36,7 @@ const CustomerDashboardPage = async () => {
     getMyPayments(),
   ]);
 
-  const active = bookings.filter((booking) =>
-    ["REQUESTED", "ACCEPTED", "PAID", "IN_PROGRESS"].includes(booking.status),
-  );
+  const active = bookings.filter((booking) => isBookingLive(booking.status));
   const completed = bookings.filter(
     (booking) => booking.status === "COMPLETED",
   );
@@ -59,6 +59,9 @@ const CustomerDashboardPage = async () => {
 
   return (
     <>
+      {/* Only worth watching while a job is actually in flight. */}
+      <LiveRefresh enabled={active.length > 0} />
+
       <PageHeader
         title={`${greeting()}${user ? `, ${user.name.split(" ")[0]}` : ""}`}
         description={

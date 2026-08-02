@@ -10,13 +10,7 @@ export const ROLE_HOME: Record<IRole, string> = {
 };
 
 export type IChipVariant =
-  | "emerald"
-  | "amber"
-  | "primary"
-  | "red"
-  | "red-strong"
-  | "violet"
-  | "neutral";
+  "emerald" | "amber" | "primary" | "red" | "red-strong" | "violet" | "neutral";
 
 export const BOOKING_STATUS_META: Record<
   IBookingStatus,
@@ -48,6 +42,22 @@ export const TECHNICIAN_TRANSITIONS: Partial<
   PAID: ["IN_PROGRESS"],
   IN_PROGRESS: ["COMPLETED"],
 };
+
+/**
+ * Statuses the other party can still move. `DECLINED`, `COMPLETED` and
+ * `CANCELLED` are the end of the line — a screen showing only those has
+ * nothing to wait for, which is what `LiveRefresh` uses to decide whether
+ * polling is worth a request.
+ */
+const LIVE_STATUSES: IBookingStatus[] = [
+  "REQUESTED",
+  "ACCEPTED",
+  "PAID",
+  "IN_PROGRESS",
+];
+
+export const isBookingLive = (status: IBookingStatus): boolean =>
+  LIVE_STATUSES.includes(status);
 
 /** A customer can only cancel before the technician has started work. */
 const CANCELLABLE: IBookingStatus[] = ["REQUESTED", "ACCEPTED", "PAID"];

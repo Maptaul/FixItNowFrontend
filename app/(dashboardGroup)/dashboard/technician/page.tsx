@@ -19,6 +19,7 @@ import { IncomingRequests } from "../../_components/IncomingRequests";
 import { PageHeader } from "../../_components/PageHeader";
 import { StatCard } from "../../_components/StatCard";
 import { TodaySchedule } from "../../_components/TodaySchedule";
+import { LiveRefresh } from "../../_components/LiveRefresh";
 
 export const metadata: Metadata = { title: "Technician dashboard" };
 
@@ -63,6 +64,14 @@ const TechnicianDashboardPage = async () => {
 
   return (
     <>
+      {/*
+       * Always on. A new request arrives without the technician doing
+       * anything, so gating this on the current list would leave a technician
+       * who had finished every job waiting forever on a screen that never
+       * refreshed itself.
+       */}
+      <LiveRefresh />
+
       <PageHeader
         title="Today's board"
         description={
