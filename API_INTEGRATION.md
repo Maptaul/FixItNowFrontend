@@ -329,7 +329,8 @@ screen would have meant showing data the platform never recorded.
 | Blocked dates with reasons | no blocked-date model |
 | Messages / chat | no messaging endpoints |
 | "Available to withdraw", the Withdraw screen, commission and payout rows | no payout, commission or withdrawal model — money moves customer → Stripe and nothing records a transfer to the technician. `/dashboard/technician/earnings` shows what *was* earned instead |
-| Notification drawer, ⌘K search | no notification or search endpoints |
+| Notification drawer | no notification endpoint. (⌘K search *is* built — there is no search endpoint either, so `dashboardSearch` fans out across the lists each role may already read) |
+| Profile picture / avatar upload | no image field anywhere in the schema and no upload endpoint — `User` is `{ id, name, email, password, role, activeStatus }` and `TechnicianProfile` is `{ bio, experienceYears, hourlyRate, location, avgRating, isVerified }`. A picture field would have had nowhere to be stored, so identity is shown with a gradient avatar derived from the name instead |
 | Audit log, review moderation, technician approvals | no such resources |
 | Category slug, stored base price, Live/Draft status | category is `{ id, name, icon }` — the table derives what it can and says so |
 | 403 page | the proxy redirects wrong-role users to their own dashboard, so a 403 is unreachable |
