@@ -83,6 +83,7 @@ const CustomerReviewsPage = async () => {
                   <div className="flex items-start gap-3">
                     <GradientAvatar
                       name={technicianName}
+                      src={booking.technician?.user?.avatarUrl}
                       kind="technician"
                       size={40}
                       radius={12}

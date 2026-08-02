@@ -50,6 +50,7 @@ const STEP_LABELS = ["Service", "Schedule", "Review"];
 export function BookingWizard({
   technicianId,
   technicianName,
+  technicianAvatarUrl,
   technicianRating,
   services,
   slots,
@@ -58,6 +59,7 @@ export function BookingWizard({
 }: {
   technicianId: string;
   technicianName: string;
+  technicianAvatarUrl?: string | null;
   technicianRating: string;
   services: IService[];
   slots: IAvailabilitySlot[];
@@ -488,6 +490,7 @@ export function BookingWizard({
           <div className="mb-4 flex items-center gap-3 border-b border-line pb-4">
             <GradientAvatar
               name={technicianName}
+              src={technicianAvatarUrl}
               kind="technician"
               size={44}
               radius={12}

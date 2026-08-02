@@ -55,6 +55,8 @@ export type IUserSummary = {
   id: string;
   name: string;
   email?: string;
+  /** A link the user supplied — the API has no upload endpoint. */
+  avatarUrl?: string | null;
 };
 
 export type ITechnicianProfile = {
@@ -140,6 +142,7 @@ export type IUser = {
   email: string;
   role: IRole;
   activeStatus: IActiveStatus;
+  avatarUrl?: string | null;
   createdAt: string;
   updatedAt: string;
   technicianProfile?: ITechnicianProfile | null;

@@ -58,6 +58,7 @@ export function ReviewComposer({ booking }: { booking: IBooking }) {
       <div className="mb-5 flex items-center gap-3 rounded-row bg-surface2 p-3">
         <GradientAvatar
           name={technicianName}
+          src={booking.technician?.user?.avatarUrl}
           kind="technician"
           size={40}
           radius={12}

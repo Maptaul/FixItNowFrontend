@@ -37,6 +37,7 @@ export function ActiveBookingPanel({ booking }: { booking: IBooking }) {
       <div className="mt-4 flex items-center gap-3 rounded-row bg-surface2 p-3">
         <GradientAvatar
           name={technicianName}
+          src={booking.technician?.user?.avatarUrl}
           kind="technician"
           size={38}
           radius={12}

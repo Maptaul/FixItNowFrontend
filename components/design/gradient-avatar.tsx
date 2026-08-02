@@ -1,10 +1,16 @@
+import Image from "next/image";
 import { getInitials } from "@/lib/format";
+import { isAllowedImageHost } from "@/lib/image-hosts";
 import { cn } from "@/lib/utils";
 
 /**
- * Avatars are gradient tiles with initials — the handoff ships no photos
- * anywhere. The gradient is chosen per identity so the same person is the
- * same colour everywhere in the product.
+ * A person's picture if they set one, otherwise a gradient tile with their
+ * initials. The gradient is chosen per identity, so someone without a photo
+ * is still the same colour everywhere in the product.
+ *
+ * `src` is a URL the user typed, so it is re-checked here against the hosts
+ * `next/image` will actually load. A stale or hand-edited value falls back to
+ * the gradient rather than rendering a broken image.
  */
 const IDENTITY_GRADIENTS = {
   customer: "linear-gradient(135deg,#2563EB,#7C3AED)",
@@ -28,12 +34,15 @@ const kindFromName = (name: string): IdentityKind => {
 
 export function GradientAvatar({
   name,
+  src,
   kind,
   size = 40,
   radius = 12,
   className,
 }: {
   name: string;
+  /** The user's picture. Ignored unless it is an allowed https host. */
+  src?: string | null;
   /** Omit to derive a stable colour from the name. */
   kind?: IdentityKind;
   size?: number;
@@ -41,6 +50,19 @@ export function GradientAvatar({
   className?: string;
 }) {
   const resolved = kind ?? kindFromName(name);
+
+  if (src && isAllowedImageHost(src)) {
+    return (
+      <Image
+        src={src}
+        alt={name}
+        width={size}
+        height={size}
+        className={cn("shrink-0 object-cover", className)}
+        style={{ width: size, height: size, borderRadius: radius }}
+      />
+    );
+  }
 
   return (
     <span

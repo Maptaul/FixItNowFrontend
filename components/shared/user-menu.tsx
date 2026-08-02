@@ -7,7 +7,10 @@ import {
   UserIcon,
 } from "lucide-react";
 import Link from "next/link";
-import { GradientAvatar, IdentityKind } from "@/components/design/gradient-avatar";
+import {
+  GradientAvatar,
+  IdentityKind,
+} from "@/components/design/gradient-avatar";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -53,11 +56,20 @@ export function UserMenu({
             aria-label="Open account menu"
             className="flex items-center gap-2 rounded-full border border-line bg-surface py-1 pr-2.5 pl-1 transition-colors duration-120 hover:bg-surface2"
           >
-            <GradientAvatar name={user.name} kind={kind} size={28} radius={999} />
+            <GradientAvatar
+              name={user.name}
+              src={user.avatarUrl}
+              kind={kind}
+              size={28}
+              radius={999}
+            />
             <span className="max-w-32 truncate text-caption text-text">
               {user.name}
             </span>
-            <ChevronDownIcon aria-hidden="true" className="size-3.5 text-text3" />
+            <ChevronDownIcon
+              aria-hidden="true"
+              className="size-3.5 text-text3"
+            />
           </button>
         ) : (
           <Button
@@ -66,7 +78,13 @@ export function UserMenu({
             aria-label="Open account menu"
             className="rounded-full"
           >
-            <GradientAvatar name={user.name} kind={kind} size={28} radius={999} />
+            <GradientAvatar
+              name={user.name}
+              src={user.avatarUrl}
+              kind={kind}
+              size={28}
+              radius={999}
+            />
           </Button>
         )}
       </DropdownMenuTrigger>

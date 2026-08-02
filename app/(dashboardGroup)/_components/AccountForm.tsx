@@ -1,20 +1,25 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useActionState, useEffect } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { toast } from "sonner";
+import { GradientAvatar } from "@/components/design/gradient-avatar";
 import { Field, FormAlert, SubmitButton } from "@/components/shared/form";
 import { Input } from "@/components/ui/input";
+import { IMAGE_HOSTS } from "@/lib/image-hosts";
 import { IFormState, IUser } from "@/lib/types";
 import { updateAccount } from "../_actions/accountActions";
 
-/** Name + password, shared by all three roles. */
+/** Name, picture and password, shared by all three roles. */
 export function AccountForm({ user }: { user: IUser }) {
   const router = useRouter();
   const [state, formAction] = useActionState<IFormState, FormData>(
     updateAccount,
     null,
   );
+
+  // Controlled so the tile beside the field previews the link as it is typed.
+  const [avatarUrl, setAvatarUrl] = useState(user.avatarUrl ?? "");
 
   useEffect(() => {
     if (!state) return;
@@ -51,6 +56,35 @@ export function AccountForm({ user }: { user: IUser }) {
           readOnly
         />
       </Field>
+
+      <div className="flex items-start gap-4">
+        <GradientAvatar
+          name={user.name}
+          src={avatarUrl}
+          size={56}
+          radius={14}
+          className="mt-7"
+        />
+
+        <div className="min-w-0 flex-1">
+          <Field
+            label="Profile picture"
+            name="avatarUrl"
+            hint={`Paste a direct image link from ${IMAGE_HOSTS.join(", ")}. Leave blank to go back to your initials.`}
+            error={state?.fieldErrors?.avatarUrl}
+          >
+            <Input
+              id="avatarUrl"
+              name="avatarUrl"
+              type="url"
+              inputMode="url"
+              value={avatarUrl}
+              onChange={(event) => setAvatarUrl(event.target.value)}
+              placeholder="https://i.ibb.co/…/photo.jpg"
+            />
+          </Field>
+        </div>
+      </div>
 
       <Field
         label="New password"

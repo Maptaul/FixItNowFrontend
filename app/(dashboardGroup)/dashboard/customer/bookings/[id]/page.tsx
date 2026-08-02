@@ -126,6 +126,7 @@ const BookingDetailsPage = async ({
             >
               <GradientAvatar
                 name={technicianName}
+                src={booking.technician?.user?.avatarUrl}
                 kind="technician"
                 size={44}
                 radius={12}

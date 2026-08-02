@@ -68,6 +68,7 @@ const TechnicianProfilePage = async () => {
           <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
             <GradientAvatar
               name={user.name}
+              src={user.avatarUrl}
               kind="technician"
               size={72}
               radius={22}

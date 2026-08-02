@@ -41,6 +41,7 @@ export function TechnicianRow({
       <div className="flex min-w-0 flex-1 gap-4">
         <GradientAvatar
           name={name}
+          src={technician.user?.avatarUrl}
           kind="technician"
           size={76}
           radius={18}

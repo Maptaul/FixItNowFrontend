@@ -252,6 +252,7 @@ export function UsersTable({
                 <span className="flex min-w-0 items-center gap-2.5">
                   <GradientAvatar
                     name={user.name}
+                    src={user.avatarUrl}
                     kind={
                       user.role === "ADMIN"
                         ? "admin"

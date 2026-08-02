@@ -44,6 +44,7 @@ export function ProfileTabs({ user }: { user: IUser }) {
         <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
           <GradientAvatar
             name={user.name}
+            src={user.avatarUrl}
             kind={KIND_BY_ROLE[user.role as IRole]}
             size={72}
             radius={22}

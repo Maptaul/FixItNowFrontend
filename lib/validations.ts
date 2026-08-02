@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { IMAGE_HOSTS, isAllowedImageHost } from "./image-hosts";
 
 const requiredString = (label: string, min = 1) =>
   z
@@ -36,11 +37,32 @@ export const updateAccountSchema = z
       .string()
       .min(6, "Password must be at least 6 characters")
       .optional(),
+    /*
+     * A link, not a file — the API has no upload endpoint. The host is
+     * checked against the same list `next/image` is configured with, so a
+     * URL that would render as a broken image is refused here with a message
+     * the user can act on. `""` is how the form clears the picture.
+     */
+    avatarUrl: z
+      .union([
+        z.literal(""),
+        z
+          .string()
+          .trim()
+          .max(500, "That URL is too long")
+          .refine(isAllowedImageHost, {
+            message: `Use an https link from ${IMAGE_HOSTS.join(", ")} — upload to imgbb.com and paste the direct link`,
+          }),
+      ])
+      .optional(),
   })
-  .refine((data) => data.name || data.password, {
-    message: "Change your name or your password before saving",
-    path: ["name"],
-  });
+  .refine(
+    (data) => data.name || data.password || data.avatarUrl !== undefined,
+    {
+      message: "Change something before saving",
+      path: ["name"],
+    },
+  );
 
 export const technicianProfileSchema = z.object({
   bio: z

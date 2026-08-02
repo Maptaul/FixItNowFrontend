@@ -34,6 +34,7 @@ const BookPage = async ({
         <BookingWizard
           technicianId={technician.id}
           technicianName={name}
+          technicianAvatarUrl={technician.user?.avatarUrl}
           technicianRating={technician.avgRating}
           services={technician.services ?? []}
           slots={technician.slots ?? []}

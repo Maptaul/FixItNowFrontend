@@ -49,6 +49,7 @@ export function BookAgainList({ bookings }: { bookings: IBooking[] }) {
                 >
                   <GradientAvatar
                     name={name}
+                    src={booking.technician?.user?.avatarUrl}
                     kind="technician"
                     size={38}
                     radius={12}

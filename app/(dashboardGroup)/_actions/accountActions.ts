@@ -14,10 +14,17 @@ export const updateAccount = async (
 ): Promise<IFormState> => {
   const name = String(formData.get("name") ?? "").trim();
   const password = String(formData.get("password") ?? "");
+  // The field is always submitted, so an empty box means "remove my picture".
+  // That has to reach the API as "", which is why it isn't collapsed to
+  // undefined the way the other two are.
+  const avatarUrl = formData.has("avatarUrl")
+    ? String(formData.get("avatarUrl") ?? "").trim()
+    : undefined;
 
   const parsed = updateAccountSchema.safeParse({
     name: name || undefined,
     password: password || undefined,
+    avatarUrl,
   });
 
   if (!parsed.success) {

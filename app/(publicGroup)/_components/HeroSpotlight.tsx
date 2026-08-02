@@ -44,7 +44,13 @@ export async function HeroSpotlight() {
       />
 
       <div className="flex items-center gap-3 rounded-row bg-surface2 p-3">
-        <GradientAvatar name={name} kind="technician" size={40} radius={12} />
+        <GradientAvatar
+          name={name}
+          src={technician.user?.avatarUrl}
+          kind="technician"
+          size={40}
+          radius={12}
+        />
 
         <div className="min-w-0 flex-1">
           <p className="truncate text-body2 font-bold text-text">{name}</p>
