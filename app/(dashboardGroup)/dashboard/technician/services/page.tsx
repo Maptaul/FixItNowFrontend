@@ -1,18 +1,17 @@
 import { PencilIcon, WrenchIcon } from "lucide-react";
 import { Metadata } from "next";
 import { redirect } from "next/navigation";
+import {
+  DataTableCard,
+  DataTableCell,
+  DataTableHead,
+  DataTableRow,
+  DataTableTh,
+} from "@/components/design/data-table";
+import { Money } from "@/components/design/money";
 import { EmptyState } from "@/components/shared/empty-state";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { formatCurrency } from "@/lib/format";
 import { getMe } from "@/service/getMe";
 import { getCategories } from "../../../../(publicGroup)/_actions/getCategories";
 import { getTechnicianById } from "../../../../(publicGroup)/_actions/getTechnicians";
@@ -53,64 +52,64 @@ const TechnicianServicesPage = async () => {
           action={<ServiceFormDialog categories={categories} />}
         />
       ) : (
-        <div className="rounded-xl border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Service</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Price</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
+        /*
+         * The app's own data table, not the raw shadcn one this page used to
+         * carry. Four columns never fit a phone, and the old table answered
+         * that with a sideways scrollbar that hid the edit and delete buttons.
+         * This one collapses each row into a labelled card below 768px, which
+         * is what every other table in the dashboard already does.
+         */
+        <DataTableCard template="1.9fr 1fr .8fr auto">
+          <DataTableHead>
+            <DataTableTh>Service</DataTableTh>
+            <DataTableTh>Category</DataTableTh>
+            <DataTableTh>Price</DataTableTh>
+            <DataTableTh className="text-right">Actions</DataTableTh>
+          </DataTableHead>
 
-            <TableBody>
-              {services.map((service) => (
-                <TableRow key={service.id}>
-                  <TableCell>
-                    <div className="font-medium">{service.title}</div>
-                    {service.description && (
-                      <div className="max-w-md truncate text-xs text-muted-foreground">
-                        {service.description}
-                      </div>
-                    )}
-                  </TableCell>
+          {services.map((service) => (
+            <DataTableRow key={service.id}>
+              <DataTableCell label="Service">
+                <p className="truncate font-semibold text-text">
+                  {service.title}
+                </p>
+                {service.description && (
+                  <p className="truncate text-[12px] text-text3">
+                    {service.description}
+                  </p>
+                )}
+              </DataTableCell>
 
-                  <TableCell>
-                    {service.category ? (
-                      <Badge variant="secondary">{service.category.name}</Badge>
-                    ) : (
-                      "—"
-                    )}
-                  </TableCell>
+              <DataTableCell label="Category">
+                {service.category ? (
+                  <Badge variant="secondary">{service.category.name}</Badge>
+                ) : (
+                  <span className="text-text3">—</span>
+                )}
+              </DataTableCell>
 
-                  <TableCell className="font-medium tabular-nums">
-                    {formatCurrency(service.price)}
-                  </TableCell>
+              <DataTableCell label="Price">
+                <Money value={service.price} className="font-semibold" />
+              </DataTableCell>
 
-                  <TableCell>
-                    <div className="flex justify-end gap-2">
-                      <ServiceFormDialog
-                        categories={categories}
-                        service={service}
-                      >
-                        <Button
-                          variant="outline"
-                          size="icon-sm"
-                          aria-label={`Edit ${service.title}`}
-                        >
-                          <PencilIcon />
-                        </Button>
-                      </ServiceFormDialog>
+              <DataTableCell className="md:text-right">
+                <div className="flex justify-end gap-2">
+                  <ServiceFormDialog categories={categories} service={service}>
+                    <Button
+                      variant="outline"
+                      size="icon-sm"
+                      aria-label={`Edit ${service.title}`}
+                    >
+                      <PencilIcon />
+                    </Button>
+                  </ServiceFormDialog>
 
-                      <DeleteServiceDialog service={service} />
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+                  <DeleteServiceDialog service={service} />
+                </div>
+              </DataTableCell>
+            </DataTableRow>
+          ))}
+        </DataTableCard>
       )}
     </>
   );

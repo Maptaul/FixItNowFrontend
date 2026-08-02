@@ -417,6 +417,25 @@
   }
 
   /*
+   * Dashboard content area.
+   *
+   * Grid items default to `min-width: auto`, which refuses to shrink below
+   * their content. Every dashboard card sits in a grid, so a single row with
+   * an un-shrinkable part — a `w-14` timestamp, a `shrink-0` status badge,
+   * a `truncate` line whose nowrap child still reports its full min-content —
+   * set a floor for the whole column. On a phone that floor was 455px against
+   * a 375px column, and the page grew 109px wider than the viewport: cards
+   * kept their left padding and lost their right edge off-screen.
+   *
+   * One rule instead of `min-w-0` on twenty-five grid wrappers. Only grid
+   * children are touched, and `shrink-0` items are unaffected, so nothing
+   * that legitimately holds its size gives way.
+   */
+  .fx-dash .grid > * {
+    min-width: 0;
+  }
+
+  /*
    * Skeleton. Compose these to the shape of the real content — image band,
    * then a 70%/90%/45% text ladder. Never a spinner where a skeleton fits.
    */

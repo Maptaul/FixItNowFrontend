@@ -30,42 +30,50 @@ export function BarChart({
   const max = Math.max(...bars.map((bar) => bar.value), 0);
 
   return (
+    /*
+     * Scrolls rather than squeezes. Twelve weekly columns want ~28px each for
+     * their date label plus the gaps; a phone offers about 300px, so without
+     * this the labels collided and the chart spilled out of its card. Each
+     * column keeps a floor of 26px and the row scrolls when they don't fit —
+     * on any screen wide enough, nothing scrolls and this is invisible.
+     */
     <div
-      className={cn("flex items-end gap-3", className)}
-      style={{ height }}
+      className={cn("-mx-1 overflow-x-auto px-1", className)}
       role="img"
       aria-label={bars
         .map((bar) => `${bar.label}: ${bar.display ?? bar.value}`)
         .join(", ")}
     >
-      {bars.map((bar, index) => {
-        const isLatest = index === bars.length - 1;
-        // A zero-value period still needs a visible baseline.
-        const pct = max === 0 ? 0 : (bar.value / max) * 100;
+      <div className="flex items-end gap-3" style={{ height }}>
+        {bars.map((bar, index) => {
+          const isLatest = index === bars.length - 1;
+          // A zero-value period still needs a visible baseline.
+          const pct = max === 0 ? 0 : (bar.value / max) * 100;
 
-        return (
-          <div
-            key={`${bar.label}-${index}`}
-            className="flex h-full flex-1 flex-col items-center justify-end gap-2"
-          >
-            <span className="font-mono text-[10.5px] text-text3">
-              {bar.display ?? bar.value}
-            </span>
-
+          return (
             <div
-              className={cn(
-                "w-full rounded-t-[7px]",
-                isLatest ? "bg-primary" : "bg-primary-soft",
-              )}
-              style={{ height: `${Math.max(pct, bar.value > 0 ? 4 : 2)}%` }}
-            />
+              key={`${bar.label}-${index}`}
+              className="flex h-full min-w-[26px] flex-1 flex-col items-center justify-end gap-2"
+            >
+              <span className="font-mono text-[10.5px] whitespace-nowrap text-text3">
+                {bar.display ?? bar.value}
+              </span>
 
-            <span className="text-[11px] font-semibold text-text3">
-              {bar.label}
-            </span>
-          </div>
-        );
-      })}
+              <div
+                className={cn(
+                  "w-full rounded-t-[7px]",
+                  isLatest ? "bg-primary" : "bg-primary-soft",
+                )}
+                style={{ height: `${Math.max(pct, bar.value > 0 ? 4 : 2)}%` }}
+              />
+
+              <span className="text-[11px] font-semibold whitespace-nowrap text-text3">
+                {bar.label}
+              </span>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
