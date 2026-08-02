@@ -197,12 +197,15 @@ const AdminDashboardPage = async () => {
 
       {/*
        * Latest bookings + activity. The handoff splits this 1.3fr / 1fr, but
-       * this is the seven-column admin table and the Scheduled date alone
-       * claims 165px; at 1.3fr the Payment column ran off the card's clipped
-       * edge. 1.9fr hands the table ~140px more, and the feed only holds
-       * short lines of text so it gives that up without noticing.
+       * a proportional rail grows with the window while the table's need does
+       * not shrink: seven columns want ~912px, of which the Scheduled date
+       * alone holds 165px nowrap, and the Payment column was the one pushed
+       * off the card's clipped edge.
+       *
+       * A fixed 320px rail — the pattern already used on the payments and
+       * booking-detail screens — hands every remaining pixel to the table.
        */}
-      <div className="mt-6 grid gap-5 lg:grid-cols-[1.9fr_1fr]">
+      <div className="mt-6 grid gap-5 lg:grid-cols-[1fr_320px]">
         <section className="min-w-0">
           <div className="mb-3 flex items-center justify-between">
             <h2 className="text-panel text-text">Latest bookings</h2>

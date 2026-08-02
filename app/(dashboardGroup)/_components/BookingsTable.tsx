@@ -281,7 +281,9 @@ export function BookingsTable({
                       </span>
                     </span>
                   ) : (
-                    <span className="text-[12px] text-text3">Not started</span>
+                    <span className="text-[12px] whitespace-nowrap text-text3">
+                      Not started
+                    </span>
                   )}
                 </DataTableCell>
               )}
