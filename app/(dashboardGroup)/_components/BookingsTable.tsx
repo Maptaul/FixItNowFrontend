@@ -249,8 +249,16 @@ export function BookingsTable({
                 </DataTableCell>
               )}
 
+              {/*
+               * nowrap does double duty: it keeps the date on one line, and
+               * because a grid track can't shrink below its item's min-content
+               * it also forces the Scheduled column to the 165px the date
+               * needs. Without it the .9fr track collapsed to 83px on the
+               * admin dashboard and the date folded onto three lines, taking
+               * the row from 52px to 100px.
+               */}
               <DataTableCell label="Scheduled">
-                <Mono className="text-[12.5px] text-text2">
+                <Mono className="text-[12.5px] whitespace-nowrap text-text2">
                   {formatDateTime(booking.scheduledAt)}
                 </Mono>
               </DataTableCell>
